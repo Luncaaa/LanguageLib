@@ -1,0 +1,28 @@
+name: "English (US)"
+flag: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGNhYzk3NzRkYTEyMTcyNDg1MzJjZTE0N2Y3ODMxZjY3YTEyZmRjY2ExY2YwY2I0YjM4NDhkZTZiYzk0YjQifX19"
+
+commands:
+  # General
+  main:
+    player_command_only: "&cOnly players can execute this command!"
+    no_permission: "&cYou don't have permission to execute this command!"
+
+  # Reload subcommand
+  reload:
+    success: "&aThe plugin has been reloaded successfully!"
+
+  # Language subcommand
+  # %language% - The language param entered by the player (if applicable)
+  language:
+    not_exist: "&cThe language &b%language% &cdoesn't exist!"
+    success: "&aSuccessfully changed your language to &e%language%&a!"
+    already_selected: "&cYou have already set your language to &b%language%&c!"
+
+# GUI opened when running the /language command.
+# %language% - The player's current language.
+inventory:
+  # What to display in the %selected% placeholder.
+  selected_placeholder:
+    selected: "&aSelected"
+    unselected: "&eSelect"
+  title: "Language selector | &6%language%"

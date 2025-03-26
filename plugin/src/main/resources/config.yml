@@ -1,0 +1,18 @@
+# The text that will appear in front of some messages.
+prefix: "&7[&6LanguageLib&7]"
+
+# The language file that will be used for admin messages and players who haven't chosen a language yet.
+default_lang: "en_us.yml"
+# When connecting for the first time, should the player's language be set to their locale (true) or to the default language (false)?
+use_player_locale: true
+
+# Used to store player data & stats.
+database:
+  # If false, a local database will be generated in the plugins/LanguageLib folder
+  use_mysql: false
+  mysql:
+    name: "au_players_data"
+    host: "localhost"
+    port: "3306"
+    username: "root"
+    password: ""

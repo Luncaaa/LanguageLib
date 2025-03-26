@@ -1,0 +1,17 @@
+main: me.lucaaa.languagelib.LanguageLib
+description: "Easily manage per-player languages"
+name: "LanguageLib"
+version: 1.0
+author: Lucaaa
+softdepend: [PlaceholderAPI]
+api-version: 1.13
+
+commands:
+  language:
+    description: Main command.
+    aliases: [lang]
+
+permissions:
+  lang.reload:
+    description: Reloads the plugin's configuration files.
+    default: op

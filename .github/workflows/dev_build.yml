@@ -1,0 +1,55 @@
+name: Developement build
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build
+        run: ./gradlew clean build
+
+      - name: Generate commit list since last release
+        id: changelog
+        run: |
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          echo "latest_tag=$LATEST_TAG" >> $GITHUB_ENV
+
+          if [ -z "$LATEST_TAG" ]; then
+            COMMIT_LOG=$(git log --pretty=format:'- [`%h`](https://github.com/${{ github.repository }}/commit/%H) %s (%an)')
+          else
+            COMMIT_LOG=$(git log $LATEST_TAG..HEAD --pretty=format:'- [`%h`](https://github.com/${{ github.repository }}/commit/%H) %s (%an)')
+          fi
+          
+          echo "commits<<EOF" >> $GITHUB_ENV
+          echo "$COMMIT_LOG" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: dev
+          name: Development Build
+          prerelease: true
+          body: ${{ env.commits || 'No changelog generated' }}
+          files: build/libs/LanguageLib-*.jar
