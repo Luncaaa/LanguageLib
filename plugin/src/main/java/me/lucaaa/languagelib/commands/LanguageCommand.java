@@ -23,17 +23,15 @@ import java.util.stream.Collectors;
 
 public class LanguageCommand implements TabExecutor {
     private final LanguageLib plugin;
-    private final MessagesManagerImpl messagesManager;
 
     public LanguageCommand(LanguageLib plugin) {
         this.plugin = plugin;
-        this.messagesManager = plugin.getManager(MessagesManagerImpl.class);
     }
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length == 1) {
-            List<String> arguments = messagesManager.getLanguagesNames().stream().map(element -> element.split("\\.")[0]).collect(Collectors.toList());
+            List<String> arguments = plugin.getManager(MessagesManagerImpl.class).getLanguagesNames().stream().map(element -> element.split("\\.")[0]).collect(Collectors.toList());
             if (sender.hasPermission("lang.reload")) arguments.add("reload");
             return arguments;
         } else {
@@ -43,6 +41,8 @@ public class LanguageCommand implements TabExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        MessagesManagerImpl messagesManager = plugin.getManager(MessagesManagerImpl.class);
+
         if (!(sender instanceof Player)) {
             MessageableImpl messageable = plugin.getServerConsole();
             if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {

@@ -25,5 +25,4 @@ public abstract class APIProvider {
     }
 
     public abstract LanguageAPI getAPI(Plugin plugin, String prefix, String languagesFolderPath);
-
 }

@@ -29,7 +29,9 @@ import java.util.stream.Collectors;
 public class MessagesManagerImpl extends Manager<String, Language> implements MessagesManager {
     private final String prefix;
     private final Language defaultLang;
-    private final String languageFolderPath;
+    private final String fullLanguageFolderPath;
+
+    private final Map<CommandSender, Messageable> messageables = new HashMap<>();
 
     private final MiniMessage miniMessage = MiniMessage.miniMessage();
     private final BungeeComponentSerializer bungeeSerializer = BungeeComponentSerializer.get();
@@ -38,7 +40,7 @@ public class MessagesManagerImpl extends Manager<String, Language> implements Me
     public MessagesManagerImpl(LanguageLib plugin, String dataFolderPath, String prefix, String languagesFolderPath, boolean isNotAPI) {
         super(plugin);
         this.prefix = prefix;
-        this.languageFolderPath = languagesFolderPath;
+        this.fullLanguageFolderPath = dataFolderPath + File.separator + languagesFolderPath;
 
         // Save default languages
         if (isNotAPI) {
@@ -48,12 +50,12 @@ public class MessagesManagerImpl extends Manager<String, Language> implements Me
         }
 
         String errorMessage = "No files found in directory";
-        File langDir = new File(languagesFolderPath);
+        File langDir = new File(fullLanguageFolderPath);
         for (File file : Objects.requireNonNull(langDir.listFiles())) {
             if (!isValidName(Config.getNameWithoutExtension(file))) {
                 errorMessage = "Files were found but with invalid name";
                 plugin.log(Level.WARNING, "=========================");
-                plugin.log(Level.WARNING, "File \"" + file.getName() + "\" has an invalid name in " + languagesFolderPath);
+                plugin.log(Level.WARNING, "File \"" + file.getName() + "\" has an invalid name in " + fullLanguageFolderPath);
                 plugin.log(Level.WARNING, "It must have the following format: \"xx_xx\", where \"x\" is a lower-case letter.");
                 plugin.log(Level.WARNING, "=========================");
                 continue;
@@ -65,7 +67,7 @@ public class MessagesManagerImpl extends Manager<String, Language> implements Me
                 if (!pluginLanguages.contains(file.getName())) {
                     plugin.log(Level.WARNING, "=========================");
                     plugin.log(Level.WARNING, "A plugin tried to register \"" + file.getName() + "\" language, but the plugin doesn't have such language.");
-                    plugin.log(Level.WARNING, "Path to file: " + languagesFolderPath);
+                    plugin.log(Level.WARNING, "Path to file: " + fullLanguageFolderPath);
                     plugin.log(Level.WARNING, "=========================");
                 }
             }
@@ -169,13 +171,23 @@ public class MessagesManagerImpl extends Manager<String, Language> implements Me
     }
 
     @Override
-    public MessageableImpl getMessageable(CommandSender sender) {
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
-            return plugin.getManager(PlayersManager.class).get(player);
-        } else {
-            return plugin.getServerConsole();
-        }
+    public Messageable getMessageable(CommandSender sender) {
+        return messageables.computeIfAbsent(sender, s -> {
+            MessageableImpl messageable;
+            if (sender instanceof Player) {
+                Player player = (Player) sender;
+                messageable = plugin.getManager(PlayersManager.class).get(player);
+            } else {
+                messageable = plugin.getServerConsole();
+            }
+
+            return messageable.withManager(this);
+        });
+    }
+
+    @Override
+    public Messageable getServerConsole() {
+        return plugin.getServerConsole();
     }
 
     public Language getDefaultLang() {
@@ -202,10 +214,14 @@ public class MessagesManagerImpl extends Manager<String, Language> implements Me
             if (first.isPresent()) {
                 return first.get();
             } else {
-                throw new NoLanguageFoundException("Could not find a valid language in " + languageFolderPath);
+                throw new NoLanguageFoundException("No valid languages in " + fullLanguageFolderPath);
             }
         } else {
             return lang;
         }
+    }
+
+    public void onLeave(Player player) {
+        messageables.remove(player);
     }
 }

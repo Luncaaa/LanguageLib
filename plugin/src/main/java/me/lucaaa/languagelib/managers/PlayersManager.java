@@ -18,7 +18,11 @@ public class PlayersManager extends Manager<Player, PlayerData> {
     }
 
     public void removePlayer(Player player) {
-        remove(player, playerData -> playerData.saveData(true));
+        remove(player, playerData -> {
+            plugin.getManager(MessagesManagerImpl.class).onLeave(player);
+            plugin.getApiProvider().onLeave(player);
+            playerData.saveData(true);
+        });
     }
 
     @Override

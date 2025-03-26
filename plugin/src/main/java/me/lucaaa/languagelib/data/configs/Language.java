@@ -10,12 +10,14 @@ import java.util.logging.Level;
 public class Language extends Config {
     private final Map<String, String> messages = new HashMap<>();
     private final Map<String, List<String>> lists = new HashMap<>();
+    private final String name;
+    private final String code;
 
     public Language(LanguageLib plugin, String dataFolderPath, String languagesFolderPath, String fileName) {
         super(plugin, dataFolderPath, languagesFolderPath + File.separator + fileName, false);
 
-        plugin.log(Level.WARNING, dataFolderPath);
-        plugin.log(Level.WARNING, languagesFolderPath);
+        this.name = config.getString("name", "No name set");
+        this.code = getNameWithoutExtension(file);
 
         // Cache head in the ItemsManager.
         String base64 = config.getString("flag", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjZlNTIyZDkxODI1MjE0OWU2ZWRlMmVkZjNmZTBmMmMyYzU4ZmVlNmFjMTFjYjg4YzYxNzIwNzIxOGFlNDU5NSJ9fX0=");
@@ -36,7 +38,7 @@ public class Language extends Config {
     public String getMessage(String key) {
         if (!messages.containsKey(key)) {
             plugin.log(Level.WARNING, "Key \"" + key + "\" not found for language \"" + file.getName() + "\"!");
-            return "Key not found for your language!";
+            return "Key not found for your language! (" + getCode() + ")";
         }
 
         return messages.get(key);
@@ -46,7 +48,7 @@ public class Language extends Config {
         if (!lists.containsKey(key)) {
             plugin.log(Level.WARNING, "Key \"" + key + "\" not found for language \"" + file.getName() + "\"!");
             ArrayList<String> notFound = new ArrayList<>();
-            notFound.add("Key not found for your language!");
+            notFound.add("Key not found for your language! (" + getCode() + ")");
             return notFound;
         }
 
@@ -58,10 +60,10 @@ public class Language extends Config {
     }
 
     public String getName() {
-        return config.getString("name", "No name set");
+        return name;
     }
 
     public String getCode() {
-        return getNameWithoutExtension(file);
+        return code;
     }
 }

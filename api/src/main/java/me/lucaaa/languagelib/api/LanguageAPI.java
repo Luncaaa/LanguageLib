@@ -36,5 +36,17 @@ public interface LanguageAPI {
      * @param sender The sender.
      * @return The messageable.
      */
-    Messageable getMessageable(CommandSender sender);
+    default Messageable getMessageable(CommandSender sender) {
+        return getMessagesManager().getMessageable(sender);
+    }
+
+    /**
+     * Gets the server's console as a messageable.<br>
+     *
+     * Messages will be sent in the default language set in LanguageLib's config.yml file.
+     * @return The server console as a messageable.
+     */
+    default Messageable getServerConsole() {
+        return getMessagesManager().getServerConsole();
+    }
 }

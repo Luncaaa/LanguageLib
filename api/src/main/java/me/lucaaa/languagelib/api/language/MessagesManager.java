@@ -224,4 +224,12 @@ public interface MessagesManager {
      * @return The language data.
      */
     Messageable getMessageable(CommandSender sender);
+
+    /**
+     * Gets the server's console as a messageable.<br>
+     *
+     * Messages will be sent in the default language set in LanguageLib's config.yml file.
+     * @return The server console as a messageable.
+     */
+    Messageable getServerConsole();
 }

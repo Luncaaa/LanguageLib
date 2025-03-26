@@ -10,7 +10,6 @@ import me.lucaaa.languagelib.listeners.*;
 import me.lucaaa.languagelib.managers.*;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -29,6 +28,9 @@ public final class LanguageLib extends JavaPlugin {
     // Managers.
     private final Map<Class<? extends Manager<?, ?>>, Manager<?, ?>> managers = new HashMap<>();
     private DatabaseManager databaseManager;
+
+    // API.
+    APIProviderImplementation apiProvider;
 
     // Reload the config files.
     public void reloadConfigs(MessageableImpl reloader) {
@@ -56,11 +58,16 @@ public final class LanguageLib extends JavaPlugin {
                 this,
                 getDataFolder().getAbsolutePath(),
                 mainConfig.prefix,
-                getDataFolder().getAbsolutePath() + File.separator + "langs",
+                "langs",
                 true
         ));
         managers.put(PlayersManager.class, new PlayersManager(this));
         managers.put(InventoriesManager.class, new InventoriesManager(this));
+
+        // API must be reloaded after previous managers have been reloaded.
+        if (isRunning) {
+            apiProvider.reload();
+        }
     }
 
     @Override
@@ -81,10 +88,11 @@ public final class LanguageLib extends JavaPlugin {
         Objects.requireNonNull(this.getCommand("language")).setExecutor(new LanguageCommand(this));
 
         // Enables the API.
-        APIProvider.setImplementation(new APIProviderImplementation(this));
+        apiProvider = new APIProviderImplementation(this);
+        APIProvider.setImplementation(apiProvider);
 
         isRunning = true;
-        serverConsole.sendMessage("&aThe plugin has been successfully enabled! &7Version: " + getDescription().getVersion(), true);
+        getManager(MessagesManagerImpl.class).sendMessage(getServer().getConsoleSender(), "&aThe plugin has been successfully enabled! &7Version: " + getDescription().getVersion(), true);
     }
 
     @Override
@@ -134,5 +142,9 @@ public final class LanguageLib extends JavaPlugin {
 
     public DatabaseManager getDatabaseManager() {
         return databaseManager;
+    }
+
+    public APIProviderImplementation getApiProvider() {
+        return apiProvider;
     }
 }

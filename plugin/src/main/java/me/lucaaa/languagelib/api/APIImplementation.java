@@ -1,28 +1,41 @@
 package me.lucaaa.languagelib.api;
 
 import me.lucaaa.languagelib.LanguageLib;
-import me.lucaaa.languagelib.api.language.Messageable;
 import me.lucaaa.languagelib.api.language.MessagesManager;
 import me.lucaaa.languagelib.managers.MessagesManagerImpl;
-import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import java.io.File;
-
 public class APIImplementation implements LanguageAPI {
-    private final MessagesManager messagesManager;
+    private final LanguageLib languageLib;
+    private final Plugin plugin;
+    private final String prefix;
+    private final String languagesFolderPath;
+
+    private MessagesManager messagesManager;
 
     public APIImplementation(LanguageLib languageLib, Plugin plugin, String prefix, String languagesFolderPath) {
-        this.messagesManager = new MessagesManagerImpl(languageLib, plugin.getDataFolder().getAbsolutePath(), prefix, plugin.getDataFolder().getAbsolutePath() + File.separator + languagesFolderPath, false);
+        this.languageLib = languageLib;
+        this.plugin = plugin;
+        this.prefix = prefix;
+        this.languagesFolderPath = languagesFolderPath;
+
+        this.messagesManager = new MessagesManagerImpl(languageLib, plugin.getDataFolder().getAbsolutePath(), prefix, languagesFolderPath, false);
+    }
+
+    /**
+     * Forces the plugin to create a new MessagesManager.
+     */
+    public void reload() {
+        this.messagesManager = new MessagesManagerImpl(languageLib, plugin.getDataFolder().getAbsolutePath(), prefix, languagesFolderPath, false);
+    }
+
+    public void onLeave(Player player) {
+        ((MessagesManagerImpl) messagesManager).onLeave(player);
     }
 
     @Override
     public MessagesManager getMessagesManager() {
         return messagesManager;
-    }
-
-    @Override
-    public Messageable getMessageable(CommandSender sender) {
-        return messagesManager.getMessageable(sender);
     }
 }
