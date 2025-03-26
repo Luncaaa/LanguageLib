@@ -8,8 +8,7 @@ import me.lucaaa.languagelib.data.configs.Config;
 import me.lucaaa.languagelib.data.configs.Language;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.lucaaa.languagelib.data.MessageableImpl;
-import me.lucaaa.languagelib.utils.NoLanguageFoundException;
-import me.lucaaa.languagelib.utils.NoLanguagesException;
+import me.lucaaa.languagelib.utils.NoLanguagesFoundException;
 import me.lucaaa.languagelib.utils.ProvidedConfig;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -19,8 +18,10 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 import java.io.File;
+import java.nio.file.NotDirectoryException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
@@ -37,10 +38,10 @@ public class MessagesManagerImpl extends Manager<String, Language> implements Me
     private final BungeeComponentSerializer bungeeSerializer = BungeeComponentSerializer.get();
     private final LegacyComponentSerializer legacySerializer = LegacyComponentSerializer.builder().hexColors().useUnusualXRepeatedCharacterHexFormat().build();
 
-    public MessagesManagerImpl(LanguageLib plugin, String dataFolderPath, String prefix, String languagesFolderPath, boolean isNotAPI) {
+    public MessagesManagerImpl(LanguageLib plugin, Plugin apiPlugin, String prefix, String languagesFolderPath, boolean isNotAPI) {
         super(plugin);
         this.prefix = prefix;
-        this.fullLanguageFolderPath = dataFolderPath + File.separator + languagesFolderPath;
+        this.fullLanguageFolderPath = apiPlugin.getDataFolder().getAbsolutePath() + File.separator + languagesFolderPath;
 
         // Save default languages
         if (isNotAPI) {
@@ -51,6 +52,13 @@ public class MessagesManagerImpl extends Manager<String, Language> implements Me
 
         String errorMessage = "No files found in directory";
         File langDir = new File(fullLanguageFolderPath);
+        if (!langDir.exists() || !langDir.isDirectory()) {
+            plugin.logError(
+                    Level.SEVERE,
+                    "Plugin \"" + apiPlugin.getName() + "\" provided an invalid directory.",
+                    new NotDirectoryException("Not a valid directory: " + fullLanguageFolderPath));
+        }
+
         for (File file : Objects.requireNonNull(langDir.listFiles())) {
             if (!isValidName(Config.getNameWithoutExtension(file))) {
                 errorMessage = "Files were found but with invalid name";
@@ -60,13 +68,13 @@ public class MessagesManagerImpl extends Manager<String, Language> implements Me
                 plugin.log(Level.WARNING, "=========================");
                 continue;
             }
-            add(file.getName(), new Language(plugin, dataFolderPath, languagesFolderPath, file.getName()));
+            add(file.getName(), new Language(plugin, apiPlugin.getDataFolder().getAbsolutePath(), languagesFolderPath, file.getName(), isNotAPI));
 
             if (!isNotAPI) {
                 Set<String> pluginLanguages = plugin.getManager(this.getClass()).getLanguagesNames();
                 if (!pluginLanguages.contains(file.getName())) {
                     plugin.log(Level.WARNING, "=========================");
-                    plugin.log(Level.WARNING, "A plugin tried to register \"" + file.getName() + "\" language, but the plugin doesn't have such language.");
+                    plugin.log(Level.WARNING, "Plugin \"" + apiPlugin.getName() + "\" tried to register \"" + file.getName() + "\" language, but the plugin doesn't have such language.");
                     plugin.log(Level.WARNING, "Path to file: " + fullLanguageFolderPath);
                     plugin.log(Level.WARNING, "=========================");
                 }
@@ -86,7 +94,7 @@ public class MessagesManagerImpl extends Manager<String, Language> implements Me
         }
 
         if (values.isEmpty()) {
-            plugin.logError(Level.SEVERE, errorMessage, new NoLanguagesException("No valid languages were found in " + languagesFolderPath));
+            plugin.logError(Level.SEVERE, errorMessage, new NoLanguagesFoundException("No valid languages were found in " + fullLanguageFolderPath));
         }
     }
 
@@ -214,7 +222,7 @@ public class MessagesManagerImpl extends Manager<String, Language> implements Me
             if (first.isPresent()) {
                 return first.get();
             } else {
-                throw new NoLanguageFoundException("No valid languages in " + fullLanguageFolderPath);
+                throw new NoLanguagesFoundException("No valid languages in " + fullLanguageFolderPath);
             }
         } else {
             return lang;

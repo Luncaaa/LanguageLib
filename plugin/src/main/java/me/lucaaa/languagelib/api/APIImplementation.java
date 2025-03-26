@@ -20,14 +20,14 @@ public class APIImplementation implements LanguageAPI {
         this.prefix = prefix;
         this.languagesFolderPath = languagesFolderPath;
 
-        this.messagesManager = new MessagesManagerImpl(languageLib, plugin.getDataFolder().getAbsolutePath(), prefix, languagesFolderPath, false);
+        this.messagesManager = new MessagesManagerImpl(languageLib, plugin, prefix, languagesFolderPath, false);
     }
 
     /**
      * Forces the plugin to create a new MessagesManager.
      */
     public void reload() {
-        this.messagesManager = new MessagesManagerImpl(languageLib, plugin.getDataFolder().getAbsolutePath(), prefix, languagesFolderPath, false);
+        this.messagesManager = new MessagesManagerImpl(languageLib, plugin, prefix, languagesFolderPath, false);
     }
 
     public void onLeave(Player player) {

@@ -14,15 +14,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class DatabaseManager {
     private final LanguageLib plugin;
-    private final Map<String, CompletableFuture<Void>> savingData = new HashMap<>();
     private final CompletableFuture<Void> dataSourceInit;
 
     // Connection pool
@@ -149,15 +146,6 @@ public class DatabaseManager {
         }
     }
 
-    private CompletableFuture<Void> isSaving(String playerName) {
-        return savingData.get(playerName);
-    }
-
-    private void addSaving(String playerName, CompletableFuture<Void> function) {
-        function.thenRun(() -> savingData.remove(playerName));
-        savingData.put(playerName, function);
-    }
-
     public void loadPlayerData(PlayerData playerData) {
         String playerName = playerData.getPlayerName();
         MessagesManagerImpl messagesManager = plugin.getManager(MessagesManagerImpl.class);
@@ -187,24 +175,12 @@ public class DatabaseManager {
         if (!dataSourceInit.isDone()) {
             dataSourceInit.thenRun(load);
         } else {
-            CompletableFuture<Void> saving = isSaving(playerName);
-            if (saving == null) {
-                CompletableFuture.runAsync(load);
-            } else {
-                saving.thenRun(load);
-            }
+            CompletableFuture.runAsync(load);
         }
     }
 
-    public void savePlayerData(PlayerData playerData, boolean async) {
+    public void savePlayerData(PlayerData playerData) {
         String playerName = playerData.getPlayerName();
-
-        Runnable task = () -> updateString(playerName, playerData.getLang().getFileName());
-
-        if (async) {
-            addSaving(playerName, CompletableFuture.runAsync(task));
-        } else {
-            task.run();
-        }
+        CompletableFuture.runAsync(() -> updateString(playerName, playerData.getLang().getFileName()));
     }
 }

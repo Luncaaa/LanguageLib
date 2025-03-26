@@ -146,10 +146,12 @@ public class LanguageInventory {
         ItemStack itemStack = plugin.getManager(ItemsManager.class).getHead(viewer, element.getFileName(), placeholders, "language");
         // Only selected language will be enchanted.
         if (element.equals(viewer.getLang())) {
-            ItemMeta meta = Objects.requireNonNull(itemStack.getItemMeta());
-            meta.addEnchant(Enchantment.MENDING, 1, true);
-            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS);
-            itemStack.setItemMeta(meta);
+            ItemMeta meta = itemStack.getItemMeta();
+            if (meta != null) {
+                meta.addEnchant(Enchantment.MENDING, 1, true);
+                meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS);
+                itemStack.setItemMeta(meta);
+            }
         } else {
             for(Enchantment enchantment : itemStack.getEnchantments().keySet()){
                 itemStack.removeEnchantment(enchantment);

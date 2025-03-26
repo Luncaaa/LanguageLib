@@ -54,29 +54,28 @@ public final class LanguageLib extends JavaPlugin {
             startDB.run();
         }
 
-        managers.put(ItemsManager.class, new ItemsManager(this, useNewHeads));
-        managers.put(MessagesManagerImpl.class, new MessagesManagerImpl(
-                this,
-                getDataFolder().getAbsolutePath(),
-                mainConfig.prefix,
-                "langs",
-                true
-        ));
-        managers.put(PlayersManager.class, new PlayersManager(this));
-        managers.put(InventoriesManager.class, new InventoriesManager(this));
+        reload.thenRun(() -> {
+            managers.put(ItemsManager.class, new ItemsManager(this, useNewHeads));
+            managers.put(MessagesManagerImpl.class, new MessagesManagerImpl(
+                    this,
+                    this,
+                    mainConfig.prefix,
+                    "langs",
+                    true
+            ));
+            managers.put(PlayersManager.class, new PlayersManager(this));
+            managers.put(InventoriesManager.class, new InventoriesManager(this));
 
-        // API must be reloaded after previous managers have been reloaded.
-        if (isRunning) {
-            apiProvider.reload();
-        }
+            // API must be reloaded after previous managers have been reloaded.
+            if (isRunning) {
+                apiProvider.reload();
+            }
 
-        // Once all managers have been loaded (including database), send success message if applicable.
-        if (reloader != null) {
-            reload.thenRun(() -> {
-                MessagesManagerImpl m = getManager(MessagesManagerImpl.class);
-                m.getMessageable(reloader).sendMessage("commands.reload.success", null);
-            });
-        }
+            // Once all managers have been loaded (including database), send success message if applicable.
+            if (reloader != null) {
+                getManager(MessagesManagerImpl.class).getMessageable(reloader).sendMessage("commands.reload.success", null);
+            }
+        });
     }
 
     @Override

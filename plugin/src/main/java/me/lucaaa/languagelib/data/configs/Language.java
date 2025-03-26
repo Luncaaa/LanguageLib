@@ -13,15 +13,17 @@ public class Language extends Config {
     private final String name;
     private final String code;
 
-    public Language(LanguageLib plugin, String dataFolderPath, String languagesFolderPath, String fileName) {
+    public Language(LanguageLib plugin, String dataFolderPath, String languagesFolderPath, String fileName, boolean isNotAPI) {
         super(plugin, dataFolderPath, languagesFolderPath + File.separator + fileName, false);
 
         this.name = config.getString("name", "No name set");
         this.code = getNameWithoutExtension(file);
 
         // Cache head in the ItemsManager.
-        String base64 = config.getString("flag", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjZlNTIyZDkxODI1MjE0OWU2ZWRlMmVkZjNmZTBmMmMyYzU4ZmVlNmFjMTFjYjg4YzYxNzIwNzIxOGFlNDU5NSJ9fX0=");
-        plugin.getManager(ItemsManager.class).cacheHead(fileName, base64);
+        if (isNotAPI) {
+            String base64 = getOrDefault("flag", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjZlNTIyZDkxODI1MjE0OWU2ZWRlMmVkZjNmZTBmMmMyYzU4ZmVlNmFjMTFjYjg4YzYxNzIwNzIxOGFlNDU5NSJ9fX0=");
+            plugin.getManager(ItemsManager.class).cacheHead(fileName, base64);
+        }
 
         // Each key that is not a config section is added to the map along with its corresponding message
         for (String key : config.getKeys(true)) {

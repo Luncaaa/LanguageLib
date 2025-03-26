@@ -29,6 +29,7 @@ public class PlayerData extends MessageableImpl {
 
     public void setLang(Language language) {
         this.lang = language;
+        plugin.getDatabaseManager().savePlayerData(this);
     }
 
     public Map<String, String> getPlaceholders() {
@@ -42,10 +43,6 @@ public class PlayerData extends MessageableImpl {
     // ---[ Database ]---
     public String getPlayerName() {
         return player.getName();
-    }
-
-    public void saveData(boolean async) {
-        plugin.getDatabaseManager().savePlayerData(this, async);
     }
     // -----
 }
