@@ -46,7 +46,7 @@ public class LanguageCommand implements TabExecutor {
         if (!(sender instanceof Player)) {
             MessageableImpl messageable = plugin.getServerConsole();
             if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
-                plugin.reloadConfigs(messageable);
+                plugin.reloadConfigs(sender);
             } else {
                 messageable.sendMessage("commands.main.player_command_only", null);
             }
@@ -59,7 +59,7 @@ public class LanguageCommand implements TabExecutor {
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("reload")) {
                 if (player.hasPermission("lang.reload")) {
-                    plugin.reloadConfigs(playerData);
+                    plugin.reloadConfigs(sender);
                 } else {
                     playerData.sendMessage("commands.main.no_permission", null);
                 }

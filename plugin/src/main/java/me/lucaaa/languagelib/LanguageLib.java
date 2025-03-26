@@ -3,11 +3,11 @@ package me.lucaaa.languagelib;
 import me.lucaaa.languagelib.api.APIProvider;
 import me.lucaaa.languagelib.api.APIProviderImplementation;
 import me.lucaaa.languagelib.commands.LanguageCommand;
-import me.lucaaa.languagelib.data.MessageableImpl;
 import me.lucaaa.languagelib.data.ServerConsole;
 import me.lucaaa.languagelib.data.configs.MainConfig;
 import me.lucaaa.languagelib.listeners.*;
 import me.lucaaa.languagelib.managers.*;
+import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
@@ -33,21 +33,22 @@ public final class LanguageLib extends JavaPlugin {
     APIProviderImplementation apiProvider;
 
     // Reload the config files.
-    public void reloadConfigs(MessageableImpl reloader) {
+    public void reloadConfigs(CommandSender reloader) {
         this.isPapiInstalled = getServer().getPluginManager().getPlugin("PlaceholderAPI") != null;
 
         mainConfig = new MainConfig(this);
 
         // Managers
         Runnable startDB = () -> databaseManager = new DatabaseManager(this, mainConfig.database.useMySQL);
+        CompletableFuture<Void> reload = CompletableFuture.supplyAsync(() -> null);
 
         if (isRunning) {
-            getManager(InventoriesManager.class).shutdown();
-            CompletableFuture.runAsync(() -> {
-                getManager(PlayersManager.class).shutdown();
+            reload = CompletableFuture.runAsync(() -> {
+                for (Manager<?, ?> manager : managers.values()) {
+                    manager.shutdown();
+                }
                 databaseManager.closePool();
                 startDB.run();
-                if (reloader != null) reloader.sendMessage("commands.reload.success", null);
             });
         } else {
             startDB.run();
@@ -67,6 +68,14 @@ public final class LanguageLib extends JavaPlugin {
         // API must be reloaded after previous managers have been reloaded.
         if (isRunning) {
             apiProvider.reload();
+        }
+
+        // Once all managers have been loaded (including database), send success message if applicable.
+        if (reloader != null) {
+            reload.thenRun(() -> {
+                MessagesManagerImpl m = getManager(MessagesManagerImpl.class);
+                m.getMessageable(reloader).sendMessage("commands.reload.success", null);
+            });
         }
     }
 
