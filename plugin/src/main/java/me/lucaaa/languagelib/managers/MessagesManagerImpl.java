@@ -46,6 +46,9 @@ public class MessagesManagerImpl extends Manager<String, Language> implements Me
         // Save default languages
         if (isNotAPI) {
             for (ProvidedConfig lang : ProvidedConfig.values()) {
+                if (plugin.getMainConfig().ignoredLanguages.contains(Config.getNameWithoutExtension(lang.getFileName()))) {
+                    continue;
+                }
                 Config.saveConfig(plugin, "langs", lang.getFileName());
             }
         }
@@ -60,7 +63,13 @@ public class MessagesManagerImpl extends Manager<String, Language> implements Me
         }
 
         for (File file : Objects.requireNonNull(langDir.listFiles())) {
-            if (!isValidName(Config.getNameWithoutExtension(file))) {
+            String name = Config.getNameWithoutExtension(file);
+
+            if (plugin.getMainConfig().ignoredLanguages.contains(name)) {
+                continue;
+            }
+
+            if (!isValidName(name)) {
                 errorMessage = "Files were found but with invalid name";
                 plugin.log(Level.WARNING, "=========================");
                 plugin.log(Level.WARNING, "File \"" + file.getName() + "\" has an invalid name in " + fullLanguageFolderPath);
@@ -68,7 +77,6 @@ public class MessagesManagerImpl extends Manager<String, Language> implements Me
                 plugin.log(Level.WARNING, "=========================");
                 continue;
             }
-            add(file.getName(), new Language(plugin, apiPlugin.getDataFolder().getAbsolutePath(), languagesFolderPath, file.getName(), isNotAPI));
 
             if (!isNotAPI) {
                 Set<String> pluginLanguages = plugin.getManager(this.getClass()).getLanguagesNames();
@@ -78,7 +86,10 @@ public class MessagesManagerImpl extends Manager<String, Language> implements Me
                     plugin.log(Level.WARNING, "Path to file: " + fullLanguageFolderPath);
                     plugin.log(Level.WARNING, "=========================");
                 }
+                continue;
             }
+
+            add(file.getName(), new Language(plugin, apiPlugin.getDataFolder().getAbsolutePath(), languagesFolderPath, file.getName(), isNotAPI));
         }
 
         if (isNotAPI) {

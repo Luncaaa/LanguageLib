@@ -77,7 +77,11 @@ public class Config {
     }
 
     public static String getNameWithoutExtension(File file) {
-        String[] parts = file.getName().split("\\.");
+        return getNameWithoutExtension(file.getName());
+    }
+
+    public static String getNameWithoutExtension(String name) {
+        String[] parts = name.split("\\.");
         // Remove extension. "-1" because end index is exclusive.
         return String.join(" ", Arrays.copyOfRange(parts, 0, parts.length - 1));
     }
