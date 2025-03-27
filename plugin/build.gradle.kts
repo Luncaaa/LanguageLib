@@ -26,6 +26,14 @@ tasks {
         relocate("com.zaxxer", "shaded.com.zaxxer")
         archiveFileName.set("${project.parent?.name}-${project.version}.jar")
         destinationDirectory.set(file("../build/libs"))
+
+        manifest {
+            attributes(
+                mapOf(
+                    "paperweight-mappings-namespace" to "mojang"
+                )
+            )
+        }
     }
 
     assemble {

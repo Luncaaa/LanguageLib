@@ -164,7 +164,7 @@ public class DatabaseManager {
                 createPlayer(playerName, language);
             }
 
-            Language lang = messagesManager.get(getLang(playerName));
+            Language lang = messagesManager.get(getLang(playerName), false);
             if (lang == null) {
                 playerData.setLang(messagesManager.getDefaultLang());
             } else {
