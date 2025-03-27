@@ -11,7 +11,7 @@ dependencies {
     implementation("com.zaxxer:HikariCP:6.2.1")
 
     implementation(project(":api"))
-    implementation(project(":v1_18_R1", "reobf"))
+    implementation(project(":v1_18_R1"))
 }
 
 tasks {
@@ -21,9 +21,7 @@ tasks {
 
     shadowJar {
         exclude("org/slf4j/**")
-        minimize {
-            exclude(project(":v1_18_R1"))
-        }
+        minimize()
         relocate("net.kyori", "shaded.net.kyori")
         relocate("com.zaxxer", "shaded.com.zaxxer")
         archiveFileName.set("${project.parent?.name}-${project.version}.jar")

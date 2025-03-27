@@ -25,7 +25,6 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 
-@SuppressWarnings("unused")
 public class HeadUtils {
     public static ItemStack createTexturedHead(String base64, boolean isPre1_18, BiConsumer<String, Throwable> onError) {
         ItemStack item = new ItemStack(Material.PLAYER_HEAD);
