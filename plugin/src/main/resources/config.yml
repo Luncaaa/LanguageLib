@@ -16,3 +16,8 @@ database:
     port: "3306"
     username: "root"
     password: ""
+
+# The languages in this list will be ignored, meaning that the default files
+# won't be created and language files from other plugins won't be registered.
+# Names must not include the file's extension (for example: en_us)
+ignored_languages: []

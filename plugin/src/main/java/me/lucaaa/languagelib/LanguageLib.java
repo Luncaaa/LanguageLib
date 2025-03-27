@@ -43,10 +43,8 @@ public final class LanguageLib extends JavaPlugin {
         CompletableFuture<Void> reload = CompletableFuture.supplyAsync(() -> null);
 
         if (isRunning) {
+            getManager(InventoriesManager.class).shutdown();
             reload = CompletableFuture.runAsync(() -> {
-                for (Manager<?, ?> manager : managers.values()) {
-                    manager.shutdown();
-                }
                 databaseManager.closePool();
                 startDB.run();
             });
@@ -60,8 +58,7 @@ public final class LanguageLib extends JavaPlugin {
                     this,
                     this,
                     mainConfig.prefix,
-                    "langs",
-                    true
+                    "langs"
             ));
             managers.put(PlayersManager.class, new PlayersManager(this));
             managers.put(InventoriesManager.class, new InventoriesManager(this));
@@ -105,10 +102,8 @@ public final class LanguageLib extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        CompletableFuture.runAsync(() -> {
-            getManager(PlayersManager.class).shutdown();
-            databaseManager.closePool();
-        });
+        getManager(InventoriesManager.class).shutdown();
+        databaseManager.closePool();
     }
 
     private boolean useNewHeads(String version) {
