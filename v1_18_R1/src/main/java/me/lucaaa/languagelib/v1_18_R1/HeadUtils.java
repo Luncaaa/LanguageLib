@@ -134,8 +134,7 @@ public class HeadUtils {
                 profileField.setAccessible(true);
 
                 GameProfile profile = (GameProfile) profileField.get(skull);
-                Property textureProperty = profile.getProperties().get("textures").iterator().next();
-                return textureProperty != null;
+                return profile != null && !profile.getProperties().get("textures").isEmpty();
 
             } catch (NoSuchFieldException | IllegalAccessException | NoSuchElementException e) {
                 onError.accept("An error occurred while comparing textures!", e);

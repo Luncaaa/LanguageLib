@@ -15,7 +15,7 @@ allprojects {
 
     tasks {
         compileJava {
-            options.release = 8
+            options.release = 11
         }
     }
 }
