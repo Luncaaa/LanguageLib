@@ -3,10 +3,10 @@ package me.lucaaa.languagelib.managers;
 import me.lucaaa.languagelib.LanguageLib;
 import me.lucaaa.languagelib.api.language.Messageable;
 import me.lucaaa.languagelib.api.language.MessagesManager;
-import me.lucaaa.languagelib.data.PlayerData;
 import me.lucaaa.languagelib.data.configs.Config;
 import me.lucaaa.languagelib.data.configs.Language;
 import me.clip.placeholderapi.PlaceholderAPI;
+import me.lucaaa.languagelib.data.LangProvider;
 import me.lucaaa.languagelib.data.MessageableImpl;
 import me.lucaaa.languagelib.utils.NoLanguagesFoundException;
 import me.lucaaa.languagelib.utils.ProvidedConfig;
@@ -166,14 +166,12 @@ public class MessagesManagerImpl extends Manager<String, Language> implements Me
     private Component parseMessage(MessageableImpl messageable, String message, Map<String, String> placeholders, boolean addPrefix) {
         if (addPrefix) message = prefix + " &r" + message;
 
+        Map<String, String> allPlaceholders = messageable.getPlaceholders();
         if (placeholders != null) {
-            message = parsePlaceHolders(message, placeholders);
+            allPlaceholders.putAll(placeholders);
         }
 
-        if (messageable instanceof PlayerData) {
-            PlayerData playerData = (PlayerData) messageable;
-            message = parsePlaceHolders(message, playerData.getPlaceholders());
-        }
+        message = parsePlaceHolders(message, allPlaceholders);
 
         if (plugin.isPapiInstalled() && messageable.isPlayer()) {
             Player player = (Player) messageable.getSender();
@@ -203,21 +201,21 @@ public class MessagesManagerImpl extends Manager<String, Language> implements Me
     @Override
     public Messageable getMessageable(CommandSender sender) {
         return messageables.computeIfAbsent(sender, s -> {
-            MessageableImpl messageable;
+            LangProvider langProvider;
             if (sender instanceof Player) {
                 Player player = (Player) sender;
-                messageable = plugin.getManager(PlayersManager.class).get(player);
+                langProvider = plugin.getManager(PlayersManager.class).get(player);
             } else {
-                messageable = plugin.getServerConsole();
+                langProvider = plugin.getServerConsole();
             }
 
-            return messageable.withManager(this);
+            return new MessageableImpl(sender, this, langProvider);
         });
     }
 
     @Override
     public Messageable getServerConsole() {
-        return plugin.getServerConsole();
+        return getMessageable(plugin.getServer().getConsoleSender());
     }
 
     public Language getDefaultLang() {

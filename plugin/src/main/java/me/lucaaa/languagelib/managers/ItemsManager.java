@@ -1,9 +1,10 @@
 package me.lucaaa.languagelib.managers;
 
 import me.lucaaa.languagelib.LanguageLib;
+import me.lucaaa.languagelib.api.language.Messageable;
+import me.lucaaa.languagelib.data.MessageableImpl;
 import me.lucaaa.languagelib.data.configs.Config;
 import me.lucaaa.languagelib.data.configs.ItemConfig;
-import me.lucaaa.languagelib.data.MessageableImpl;
 import me.lucaaa.languagelib.data.configs.Language;
 import me.lucaaa.languagelib.utils.ProvidedConfig;
 import me.lucaaa.languagelib.utils.SpecialStacks;
@@ -55,7 +56,7 @@ public class ItemsManager extends Manager<String, ItemConfig> {
         this.NOT_FOUND = notFound;
     }
 
-    public ItemStack getItem(MessageableImpl messageable, String key, Map<String, String> placeholders) {
+    public ItemStack getItem(Messageable messageable, String key, Map<String, String> placeholders) {
         ItemConfig.Item item = getItemOrDefault(messageable, key);
         if (item == null) return NOT_FOUND;
 
@@ -68,7 +69,7 @@ public class ItemsManager extends Manager<String, ItemConfig> {
         );
     }
 
-    public ItemStack getHead(MessageableImpl messageable, String key, Map<String, String> placeholders, String alternativeItem) {
+    public ItemStack getHead(Messageable messageable, String key, Map<String, String> placeholders, String alternativeItem) {
         // The cached head itemStack (doesn't have name, lore or enchanted value).
         ItemStack cachedHead = heads.get(key);
         // The name, lore and enchanted value set in the items config file (maybe a different material).
@@ -90,7 +91,7 @@ public class ItemsManager extends Manager<String, ItemConfig> {
         return parseItem(parsedHead, messageable, placeholders);
     }
 
-    private ItemStack parseItem(ItemConfig.Item item, MessageableImpl messageable, Map<String, String> placeholders) {
+    private ItemStack parseItem(ItemConfig.Item item, Messageable messageable, Map<String, String> placeholders) {
         ItemStack itemStack = item.itemStack;
         if (itemStack instanceof SpecialStacks) {
             return itemStack;
@@ -117,19 +118,20 @@ public class ItemsManager extends Manager<String, ItemConfig> {
         return itemStack;
     }
 
-    private ItemConfig.Item getItemOrDefault(MessageableImpl messageable, String key) {
+    private ItemConfig.Item getItemOrDefault(Messageable messageable, String key) {
         MessagesManagerImpl messagesManager = plugin.getManager(MessagesManagerImpl.class);
-        Language language = messageable.getLang();
+        MessageableImpl messageableImpl = (MessageableImpl) messageable;
+        Language language = messageableImpl.getLang();
 
         ItemConfig itemConfig = get(language.getFileName(), false);
         if (itemConfig == null) {
             language = messagesManager.getDefaultLang();
-            plugin.log(Level.WARNING, "Items config file was not found for language \"" + messageable.getLang().getFileName() + "\". Setting to default language. (Item: " + key + ")");
+            plugin.log(Level.WARNING, "Items config file was not found for language \"" + messageableImpl.getLang().getFileName() + "\". Setting to default language. (Item: " + key + ")");
 
             ItemConfig newItemConfig = get(language.getFileName());
             if (newItemConfig == null) {
                 language = messagesManager.get(ProvidedConfig.EN_US.getFileName());
-                plugin.log(Level.WARNING, "Items config file was not found for default language \"" + messageable.getLang().getFileName() + "\". Setting to " + language.getFileName() + ". (Item: " + key + ")");
+                plugin.log(Level.WARNING, "Items config file was not found for default language \"" + messageableImpl.getLang().getFileName() + "\". Setting to " + language.getFileName() + ". (Item: " + key + ")");
             }
         }
 

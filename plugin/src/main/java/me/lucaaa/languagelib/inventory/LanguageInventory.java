@@ -1,11 +1,14 @@
 package me.lucaaa.languagelib.inventory;
 
 import me.lucaaa.languagelib.LanguageLib;
+import me.lucaaa.languagelib.api.language.Messageable;
+import me.lucaaa.languagelib.data.MessageableImpl;
 import me.lucaaa.languagelib.data.PlayerData;
 import me.lucaaa.languagelib.data.configs.Language;
 import me.lucaaa.languagelib.managers.InventoriesManager;
 import me.lucaaa.languagelib.managers.ItemsManager;
 import me.lucaaa.languagelib.managers.MessagesManagerImpl;
+import me.lucaaa.languagelib.managers.PlayersManager;
 import me.lucaaa.languagelib.utils.SpecialStacks;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -27,7 +30,7 @@ public class LanguageInventory {
     private final Map<Integer, InventoryButton> buttons = new HashMap<>();
     private boolean loaded = false;
     private final Inventory inventory;
-    protected final PlayerData viewer;
+    protected final Messageable viewer;
     private final List<Language> elements;
 
     private final int pageIndex;
@@ -40,11 +43,11 @@ public class LanguageInventory {
 
     private final LanguageInventory previous;
 
-    public LanguageInventory(LanguageLib plugin, PlayerData viewer) {
+    public LanguageInventory(LanguageLib plugin, Messageable viewer) {
         this(plugin, viewer, 0, new ArrayList<>(plugin.getManager(MessagesManagerImpl.class).getLanguages()), null);
     }
 
-    public LanguageInventory(LanguageLib plugin, PlayerData viewer, int pageIndex, List<Language> elements, LanguageInventory previous) {
+    public LanguageInventory(LanguageLib plugin, Messageable viewer, int pageIndex, List<Language> elements, LanguageInventory previous) {
         this.plugin = plugin;
         this.itemsManager = plugin.getManager(ItemsManager.class);
         this.messagesManager = plugin.getManager(MessagesManagerImpl.class);
@@ -125,15 +128,17 @@ public class LanguageInventory {
     }
 
     protected void reopen() {
-        Player player = (Player) viewer.getSender();
+        Player player = (Player) ((MessageableImpl) viewer).getSender();
         plugin.getManager(InventoriesManager.class).handleOpen(player, copy(pageIndex, previous));
     }
 
     private InventoryButton parseButton(Language element) {
         Map<String, String> placeholders = getPlaceholders();
+        Player player = (Player) ((MessageableImpl) viewer).getSender();
+        PlayerData playerData = plugin.getManager(PlayersManager.class).get(player);
 
         String selected;
-        if (element.equals(viewer.getLang())) {
+        if (element.equals(playerData.getLang())) {
             selected = messagesManager.getUnparsedMessage(viewer, "inventory.selected_placeholder.selected");
         } else {
             selected = messagesManager.getUnparsedMessage(viewer, "inventory.selected_placeholder.unselected");
@@ -145,7 +150,7 @@ public class LanguageInventory {
 
         ItemStack itemStack = plugin.getManager(ItemsManager.class).getHead(viewer, element.getFileName(), placeholders, "language");
         // Only selected language will be enchanted.
-        if (element.equals(viewer.getLang())) {
+        if (element.equals(playerData.getLang())) {
             ItemMeta meta = itemStack.getItemMeta();
             if (meta != null) {
                 meta.addEnchant(Enchantment.MENDING, 1, true);
@@ -161,10 +166,10 @@ public class LanguageInventory {
         return new InventoryButton(itemStack) {
             @Override
             public void onClick(InventoryClickEvent event) {
-                if (element.equals(viewer.getLang())) {
+                if (element.equals(playerData.getLang())) {
                     viewer.sendMessage("commands.language.already_selected", null);
                 } else {
-                    viewer.setLang(element);
+                    playerData.setLang(element);
                     reopen();
                     viewer.sendMessage("commands.language.success", null);
                 }

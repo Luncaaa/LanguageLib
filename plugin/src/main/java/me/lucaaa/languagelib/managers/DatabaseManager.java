@@ -152,7 +152,7 @@ public class DatabaseManager {
 
         Runnable load = () -> {
             boolean exists = playerExists(playerName);
-            Player player = (Player) playerData.getSender();
+            Player player = (Player) playerData.getPlayer();
 
             if (!exists) {
                 String language;

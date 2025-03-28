@@ -1,7 +1,7 @@
 package me.lucaaa.languagelib.commands;
 
 import me.lucaaa.languagelib.LanguageLib;
-import me.lucaaa.languagelib.data.MessageableImpl;
+import me.lucaaa.languagelib.api.language.Messageable;
 import me.lucaaa.languagelib.data.PlayerData;
 import me.lucaaa.languagelib.data.configs.Language;
 import me.lucaaa.languagelib.inventory.LanguageInventory;
@@ -44,7 +44,7 @@ public class LanguageCommand implements TabExecutor {
         MessagesManagerImpl messagesManager = plugin.getManager(MessagesManagerImpl.class);
 
         if (!(sender instanceof Player)) {
-            MessageableImpl messageable = plugin.getServerConsole();
+            Messageable messageable = messagesManager.getServerConsole();
             if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
                 plugin.reloadConfigs(sender);
             } else {
@@ -54,6 +54,7 @@ public class LanguageCommand implements TabExecutor {
         }
 
         Player player = (Player) sender;
+        Messageable messageable = messagesManager.getMessageable(sender);
         PlayerData playerData = plugin.getManager(PlayersManager.class).get(player);
 
         if (args.length == 1) {
@@ -61,7 +62,7 @@ public class LanguageCommand implements TabExecutor {
                 if (player.hasPermission("lang.reload")) {
                     plugin.reloadConfigs(sender);
                 } else {
-                    playerData.sendMessage("commands.main.no_permission", null);
+                    messageable.sendMessage("commands.main.no_permission", null);
                 }
                 return true;
             }
@@ -70,18 +71,18 @@ public class LanguageCommand implements TabExecutor {
             Map<String, String> placeholders = new HashMap<>();
             placeholders.put("%language%", args[0]);
             if (language == null) {
-                playerData.sendMessage("commands.language.not_exist", placeholders);
+                messageable.sendMessage("commands.language.not_exist", placeholders);
             } else {
                 if (language.equals(playerData.getLang())) {
-                    playerData.sendMessage("commands.language.already_selected", placeholders);
+                    messageable.sendMessage("commands.language.already_selected", placeholders);
                 } else {
                     playerData.setLang(language);
-                    playerData.sendMessage("commands.language.success", placeholders);
+                    messageable.sendMessage("commands.language.success", placeholders);
                 }
             }
 
         } else {
-            plugin.getManager(InventoriesManager.class).handleOpen(player, new LanguageInventory(plugin, playerData));
+            plugin.getManager(InventoriesManager.class).handleOpen(player, new LanguageInventory(plugin, messageable));
         }
 
         return true;

@@ -7,16 +7,19 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
+import java.util.HashMap;
 
-public abstract class MessageableImpl implements Messageable {
+public class MessageableImpl implements Messageable {
     private final CommandSender sender;
     private final boolean isPlayer;
     private final MessagesManager messagesManager;
+    private final LangProvider langProvider;
 
-    public MessageableImpl(CommandSender sender, MessagesManager messagesManager) {
+    public MessageableImpl(CommandSender sender, MessagesManager messagesManager, LangProvider langProvider) {
         this.sender = sender;
         this.isPlayer = sender instanceof Player;
         this.messagesManager = messagesManager;
+        this.langProvider = langProvider;
     }
 
     @Override
@@ -28,18 +31,18 @@ public abstract class MessageableImpl implements Messageable {
         return sender;
     }
 
-    public abstract Language getLang();
+    public Language getLang() {
+        return langProvider.getLang();
+    }
 
     public boolean isPlayer() {
         return isPlayer;
     }
 
-    public MessageableImpl withManager(MessagesManager messagesManager) {
-        return new MessageableImpl(sender, messagesManager) {
-            @Override
-            public Language getLang() {
-                return MessageableImpl.this.getLang();
-            }
-        };
+    public Map<String, String> getPlaceholders() {
+        Map<String, String> placeholders = new HashMap<>();
+        placeholders.put("%language%", getLang().getName());
+        placeholders.put("%language_code%", getLang().getCode());
+        return placeholders;
     }
 }
