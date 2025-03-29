@@ -169,7 +169,7 @@ public class LanguageInventory {
                 if (element.equals(playerData.getLang())) {
                     viewer.sendMessage("commands.language.already_selected", null);
                 } else {
-                    playerData.setLang(element);
+                    playerData.setLang(element, true);
                     reopen();
                     viewer.sendMessage("commands.language.success", null);
                 }

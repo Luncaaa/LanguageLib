@@ -31,7 +31,7 @@ public class InventoriesManager extends Manager<Player, LanguageInventory> {
     }
 
     public void handleClose(Player player) {
-        remove(player, gui -> {});
+        remove(player, gui -> {}, false);
     }
 
     @Override

@@ -28,9 +28,13 @@ public class Manager<K, T> {
     }
 
     public void remove(K toRemove, Consumer<T> ifExists) {
+        remove(toRemove, ifExists, true);
+    }
+
+    public void remove(K toRemove, Consumer<T> ifExists, boolean log) {
         T removed = values.remove(toRemove);
         if (removed == null) {
-            plugin.log(Level.WARNING, getClass().getSimpleName() + " tried to remove a non-existent element: " + toRemove);
+            if (log) plugin.log(Level.WARNING, getClass().getSimpleName() + " tried to remove a non-existent element: " + toRemove);
         } else {
             ifExists.accept(removed);
         }

@@ -137,7 +137,7 @@ public class MessagesManagerImpl extends Manager<String, Language> implements Me
     @Override
     public List<String> getList(Messageable messageable, String key, Map<String, String> placeholders) {
         List<String> unparsed = getUnparsedList(messageable, key);
-        return unparsed.stream().map(line -> legacySerializer.serialize(parseMessage((MessageableImpl) messageable, line, placeholders, false))).collect(Collectors.toList());
+        return unparsed.stream().map(line -> legacySerializer.serialize(parseMessage(messageable, line, placeholders, false))).collect(Collectors.toList());
     }
 
     @Override
@@ -151,7 +151,7 @@ public class MessagesManagerImpl extends Manager<String, Language> implements Me
     }
 
     private Component getMessage(Messageable messageable, String key, Map<String, String> placeholders, boolean addPrefix) {
-        return parseMessage((MessageableImpl) messageable, getLanguage(messageable).getMessage(key), placeholders, addPrefix);
+        return parseMessage(messageable, getLanguage(messageable).getMessage(key), placeholders, addPrefix);
     }
 
     @Override
@@ -160,21 +160,22 @@ public class MessagesManagerImpl extends Manager<String, Language> implements Me
     }
 
     public String toLegacy(Messageable messageable, String message, Map<String, String> placeholders) {
-        return legacySerializer.serialize(parseMessage((MessageableImpl) messageable, message, placeholders, false));
+        return legacySerializer.serialize(parseMessage(messageable, message, placeholders, false));
     }
 
-    private Component parseMessage(MessageableImpl messageable, String message, Map<String, String> placeholders, boolean addPrefix) {
+    private Component parseMessage(Messageable messageable, String message, Map<String, String> placeholders, boolean addPrefix) {
         if (addPrefix) message = prefix + " &r" + message;
 
-        Map<String, String> allPlaceholders = messageable.getPlaceholders();
+        MessageableImpl messageableImpl = (MessageableImpl) messageable;
+        Map<String, String> allPlaceholders = messageableImpl.getPlaceholders();
         if (placeholders != null) {
             allPlaceholders.putAll(placeholders);
         }
 
         message = parsePlaceHolders(message, allPlaceholders);
 
-        if (plugin.isPapiInstalled() && messageable.isPlayer()) {
-            Player player = (Player) messageable.getSender();
+        if (plugin.isPapiInstalled() && messageableImpl.isPlayer()) {
+            Player player = (Player) messageableImpl.getSender();
             message = PlaceholderAPI.setPlaceholders(player, message);
         }
 

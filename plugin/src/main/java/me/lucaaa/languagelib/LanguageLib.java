@@ -2,12 +2,12 @@ package me.lucaaa.languagelib;
 
 import me.lucaaa.languagelib.api.APIProvider;
 import me.lucaaa.languagelib.api.APIProviderImplementation;
+import me.lucaaa.languagelib.api.language.Messageable;
 import me.lucaaa.languagelib.commands.LanguageCommand;
 import me.lucaaa.languagelib.data.ServerConsole;
 import me.lucaaa.languagelib.data.configs.MainConfig;
 import me.lucaaa.languagelib.listeners.*;
 import me.lucaaa.languagelib.managers.*;
-import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
@@ -33,7 +33,7 @@ public final class LanguageLib extends JavaPlugin {
     APIProviderImplementation apiProvider;
 
     // Reload the config files.
-    public void reloadConfigs(CommandSender reloader) {
+    public void reloadConfigs(Messageable reloader) {
         this.isPapiInstalled = getServer().getPluginManager().getPlugin("PlaceholderAPI") != null;
 
         mainConfig = new MainConfig(this);
@@ -70,7 +70,9 @@ public final class LanguageLib extends JavaPlugin {
 
             // Once all managers have been loaded (including database), send success message if applicable.
             if (reloader != null) {
-                getManager(MessagesManagerImpl.class).getMessageable(reloader).sendMessage("commands.reload.success", null);
+                // getManager(MessagesManagerImpl.class) is used instead of reloader.sendMessage() so that the newly created
+                // language files are used instead of the ones before reloading (they might have changes).
+                getManager(MessagesManagerImpl.class).sendMessage(reloader, "commands.reload.success", null);
             }
         });
     }

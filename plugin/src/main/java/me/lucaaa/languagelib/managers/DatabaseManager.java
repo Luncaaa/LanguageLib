@@ -152,7 +152,7 @@ public class DatabaseManager {
 
         Runnable load = () -> {
             boolean exists = playerExists(playerName);
-            Player player = (Player) playerData.getPlayer();
+            Player player = playerData.getPlayer();
 
             if (!exists) {
                 String language;
@@ -166,9 +166,9 @@ public class DatabaseManager {
 
             Language lang = messagesManager.get(getLang(playerName), false);
             if (lang == null) {
-                playerData.setLang(messagesManager.getDefaultLang());
+                playerData.setLang(messagesManager.getDefaultLang(), false);
             } else {
-                playerData.setLang(lang);
+                playerData.setLang(lang, false);
             }
         };
 

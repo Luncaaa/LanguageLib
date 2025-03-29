@@ -22,9 +22,9 @@ public class PlayerData implements LangProvider {
         return lang;
     }
 
-    public void setLang(Language language) {
+    public void setLang(Language language, boolean save) {
         this.lang = language;
-        plugin.getDatabaseManager().savePlayerData(this);
+        if (save) plugin.getDatabaseManager().savePlayerData(this);
     }
     // -----
 

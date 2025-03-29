@@ -1,6 +1,8 @@
+# material: EMPTY can be used to not set items in that slot.
+# However, it might be filled with something else if applicable (for example, the border)
+
 # %page% - The current page.
 # %total_pages% - The complete number of pages.
-
 border:
   material: ORANGE_STAINED_GLASS_PANE
   name: " "

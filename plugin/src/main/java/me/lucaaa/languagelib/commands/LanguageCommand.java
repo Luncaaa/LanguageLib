@@ -42,11 +42,11 @@ public class LanguageCommand implements TabExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         MessagesManagerImpl messagesManager = plugin.getManager(MessagesManagerImpl.class);
+        Messageable messageable = messagesManager.getMessageable(sender);
 
         if (!(sender instanceof Player)) {
-            Messageable messageable = messagesManager.getServerConsole();
             if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
-                plugin.reloadConfigs(sender);
+                plugin.reloadConfigs(messageable);
             } else {
                 messageable.sendMessage("commands.main.player_command_only", null);
             }
@@ -54,13 +54,12 @@ public class LanguageCommand implements TabExecutor {
         }
 
         Player player = (Player) sender;
-        Messageable messageable = messagesManager.getMessageable(sender);
         PlayerData playerData = plugin.getManager(PlayersManager.class).get(player);
 
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("reload")) {
                 if (player.hasPermission("lang.reload")) {
-                    plugin.reloadConfigs(sender);
+                    plugin.reloadConfigs(messageable);
                 } else {
                     messageable.sendMessage("commands.main.no_permission", null);
                 }
@@ -76,7 +75,7 @@ public class LanguageCommand implements TabExecutor {
                 if (language.equals(playerData.getLang())) {
                     messageable.sendMessage("commands.language.already_selected", placeholders);
                 } else {
-                    playerData.setLang(language);
+                    playerData.setLang(language, true);
                     messageable.sendMessage("commands.language.success", placeholders);
                 }
             }
