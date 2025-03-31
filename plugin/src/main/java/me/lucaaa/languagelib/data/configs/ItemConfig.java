@@ -8,9 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
-import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -19,8 +17,8 @@ public class ItemConfig extends Config {
     private final boolean useNewHeads;
     private final Map<String, Item> items = new HashMap<>();
 
-    public ItemConfig(LanguageLib plugin, String fileName, boolean useNewHeads) {
-        super(plugin, "items" + File.separator + fileName, false);
+    public ItemConfig(LanguageLib plugin, boolean useNewHeads) {
+        super(plugin, "items.yml", false);
         this.useNewHeads = useNewHeads;
 
         // Each key that is not a config section is added to the map along with its corresponding message
@@ -52,7 +50,7 @@ public class ItemConfig extends Config {
         }
 
         String name = itemSection.getString("name");
-        List<String> lore = itemSection.getStringList("lore");
+        String lore = itemSection.getString("lore");
         boolean enchanted = itemSection.getBoolean("enchanted", false);
         int customModelData = itemSection.getInt("customModelData", 0);
 
@@ -82,11 +80,11 @@ public class ItemConfig extends Config {
     public static class Item {
         public final ItemStack itemStack;
         public final String name;
-        public final List<String> lore;
+        public final String lore;
         public final boolean enchanted;
         public final int customModelData;
 
-        public Item(ItemStack itemStack, String name, List<String> lore, boolean enchanted, int customModelData) {
+        public Item(ItemStack itemStack, String name, String lore, boolean enchanted, int customModelData) {
             this.itemStack = itemStack;
             this.name = name;
             this.lore = lore;

@@ -2,11 +2,9 @@ package me.lucaaa.languagelib.managers;
 
 import me.lucaaa.languagelib.LanguageLib;
 import me.lucaaa.languagelib.api.language.Messageable;
-import me.lucaaa.languagelib.data.MessageableImpl;
+import me.lucaaa.languagelib.api.language.MessagesManager;
 import me.lucaaa.languagelib.data.configs.Config;
 import me.lucaaa.languagelib.data.configs.ItemConfig;
-import me.lucaaa.languagelib.data.configs.Language;
-import me.lucaaa.languagelib.utils.ProvidedConfig;
 import me.lucaaa.languagelib.utils.SpecialStacks;
 import me.lucaaa.languagelib.v1_18_R1.HeadUtils;
 import org.bukkit.ChatColor;
@@ -16,16 +14,15 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.io.File;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 
-public class ItemsManager extends Manager<String, ItemConfig> {
+public class ItemsManager extends Manager<String, ItemConfig.Item> {
     private final boolean useNewHeads;
+    private final ItemConfig itemConfig;
     private final Map<String, ItemStack> heads = new HashMap<>();
     private final ItemStack NOT_FOUND;
     private final BiConsumer<String, Throwable> onError;
@@ -35,15 +32,10 @@ public class ItemsManager extends Manager<String, ItemConfig> {
         this.useNewHeads = useNewHeads;
         this.onError = (message, error) -> plugin.logError(Level.WARNING, message, error);
 
-        // Save default item config files.
-        for (ProvidedConfig items : ProvidedConfig.values()) {
-            Config.saveConfig(plugin, "items", items.getFileName());
-        }
+        // Save default item config file.
+        Config.saveConfig(plugin, "items.yml");
 
-        File langDir = new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "items");
-        for (File file : Objects.requireNonNull(langDir.listFiles())) {
-            add(file.getName(), new ItemConfig(plugin, file.getName(), useNewHeads));
-        }
+        this.itemConfig = new ItemConfig(plugin, useNewHeads);
 
         // Loads item that is used when item is not found
         ItemStack notFound = new ItemStack(Material.BARRIER);
@@ -57,7 +49,7 @@ public class ItemsManager extends Manager<String, ItemConfig> {
     }
 
     public ItemStack getItem(Messageable messageable, String key, Map<String, String> placeholders) {
-        ItemConfig.Item item = getItemOrDefault(messageable, key);
+        ItemConfig.Item item = itemConfig.getItem(key);
         if (item == null) return NOT_FOUND;
 
         return parseItem(item, messageable, placeholders);
@@ -73,7 +65,7 @@ public class ItemsManager extends Manager<String, ItemConfig> {
         // The cached head itemStack (doesn't have name, lore or enchanted value).
         ItemStack cachedHead = heads.get(key);
         // The name, lore and enchanted value set in the items config file (maybe a different material).
-        ItemConfig.Item headSettings = getItemOrDefault(messageable, alternativeItem);
+        ItemConfig.Item headSettings = itemConfig.getItem(alternativeItem);
 
         if (headSettings == null) return NOT_FOUND;
 
@@ -97,15 +89,16 @@ public class ItemsManager extends Manager<String, ItemConfig> {
             return itemStack;
         }
 
-        MessagesManagerImpl messagesManager = plugin.getManager(MessagesManagerImpl.class);
+        MessagesManager messagesManager = plugin.getManager(MessagesManagerImpl.class);
         ItemMeta meta = itemStack.getItemMeta();
         if (meta != null) {
             if (item.name != null) {
-                meta.setDisplayName(messagesManager.toLegacy(messageable, item.name, placeholders));
+                meta.setDisplayName(messagesManager.getMessageLegacy(messageable, item.name, placeholders, false));
             }
 
-            List<String> lore = item.lore.stream().map(line -> messagesManager.toLegacy(messageable, line, placeholders)).collect(Collectors.toList());
-            meta.setLore(lore);
+            if (item.lore != null) {
+                meta.setLore(messagesManager.getList(messageable, item.lore, placeholders));
+            }
 
             if (item.enchanted) {
                 meta.addEnchant(Enchantment.MENDING, 1, true);
@@ -116,26 +109,6 @@ public class ItemsManager extends Manager<String, ItemConfig> {
         }
 
         return itemStack;
-    }
-
-    private ItemConfig.Item getItemOrDefault(Messageable messageable, String key) {
-        MessagesManagerImpl messagesManager = plugin.getManager(MessagesManagerImpl.class);
-        MessageableImpl messageableImpl = (MessageableImpl) messageable;
-        Language language = messageableImpl.getLang();
-
-        ItemConfig itemConfig = get(language.getFileName(), false);
-        if (itemConfig == null) {
-            language = messagesManager.getDefaultLang();
-            plugin.log(Level.WARNING, "Items config file was not found for language \"" + messageableImpl.getLang().getFileName() + "\". Setting to default language. (Item: " + key + ")");
-
-            ItemConfig newItemConfig = get(language.getFileName());
-            if (newItemConfig == null) {
-                language = messagesManager.get(ProvidedConfig.EN_US.getFileName());
-                plugin.log(Level.WARNING, "Items config file was not found for default language \"" + messageableImpl.getLang().getFileName() + "\". Setting to " + language.getFileName() + ". (Item: " + key + ")");
-            }
-        }
-
-        return get(language.getFileName()).getItem(key);
     }
 
     public static Material parseMaterial(String configName, Consumer<String> ifNull) {

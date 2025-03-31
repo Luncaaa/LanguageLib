@@ -55,7 +55,7 @@ public class LanguageInventory {
         this.inventory = Bukkit.createInventory(
                 null,
                 9 * getRows(elements.size()),
-                messagesManager.toLegacy(viewer, "inventory.title", getPlaceholders(pageIndex, elements.size()), false)
+                messagesManager.getMessageLegacy(viewer, "inventory.title", getPlaceholders(pageIndex, elements.size()), false)
         );
         this.viewer = viewer;
         this.elements = elements;

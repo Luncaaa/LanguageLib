@@ -29,11 +29,11 @@ public class Config {
         this.config = YamlConfiguration.loadConfiguration(file);
     }
 
-    public static void saveConfig(LanguageLib plugin, String folder, String fileName) {
-        File file = new File(plugin.getDataFolder().getAbsolutePath() + File.separator + folder + File.separator + fileName);
+    public static void saveConfig(LanguageLib plugin, String filePath) {
+        File file = new File(plugin.getDataFolder().getAbsolutePath() + File.separator + filePath);
 
         if (!file.exists()) {
-            plugin.saveResource(folder + File.separator + fileName, false);
+            plugin.saveResource(filePath, false);
         }
     }
 

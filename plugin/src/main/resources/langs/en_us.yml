@@ -26,3 +26,38 @@ inventory:
     selected: "&aSelected"
     unselected: "&eSelect"
   title: "Language selector | &6%language%"
+
+  # %page% - The current page.
+  # %total_pages% - The complete number of pages.
+  items:
+    border:
+      name: " "
+
+    previous_page:
+      name: "&6&lPrevious page"
+
+    current_page:
+      name: "&6&lCurrent page: &r&e%page%&7/%total_pages%"
+
+    next_page:
+      name: "&6&lNext page"
+
+    # For each language button in the inventory.
+    # %language% - The player's current language.
+    # %name% - The language's name. Defined in its config file inside the "langs" folder.
+    # %selected% - Displays whether the language is selected or not. See the "selected_placeholder" setting in the language file.
+    # %flag% - Value set in the "flag" setting in the language's config file.
+    # %code% - The language's code. For example: en_us.yml -> en_us
+    language:
+      name: "&6&l%name%"
+      lore:
+        - "&7%code%"
+        - "%selected%"
+
+    # Item on the top left of the GUI
+    # Useful to explain server rules.
+    info:
+      name: "&9&lInformation"
+      lore:
+        - "&7Changes the language of some messages sent by plugins."
+        - "&bEnglish &7should still be used in public channels."

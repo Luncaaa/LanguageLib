@@ -1,43 +1,46 @@
-# material: EMPTY can be used to not set items in that slot.
+# "material: EMPTY" can be used to not set items in that slot.
 # However, it might be filled with something else if applicable (for example, the border)
 
-# %page% - The current page.
-# %total_pages% - The complete number of pages.
+# The "name" field must be the key to a String in the messages file.
+# The "lore" field must be the key to a list of strings in the messages file.
+#
+# If, for example, the messages file has the following structure:
+#
+# inventory:
+#  items:
+#    border:
+#      name: "Border name"
+#
+# The key of the border item name would be "inventory.items.border.name"
 border:
   material: ORANGE_STAINED_GLASS_PANE
-  name: " "
+  name: "inventory.items.border.name"
 
 previous_page:
   material: PLAYER_HEAD
   head:
     base64: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzZlYmFhNDFkMWQ0MDVlYjZiNjA4NDViYjlhYzcyNGFmNzBlODVlYWM4YTk2YTU1NDRiOWUyM2FkNmM5NmM2MiJ9fX0="
-  name: "&6&lPrevious page"
+  name: "inventory.items.previous_page.name"
 
 current_page:
   material: BOOK
-  name: "&6&lCurrent page: &r&e%page%&7/%total_pages%"
+  name: "inventory.items.current_page.name"
   enchanted: true
 
 next_page:
   material: PLAYER_HEAD
   head:
     base64: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODM5OWU1ZGE4MmVmNzc2NWZkNWU0NzJmMzE0N2VkMTE4ZDk4MTg4NzczMGVhN2JiODBkN2ExYmVkOThkNWJhIn19fQ=="
-  name: "&6&lNext page"
+  name: "inventory.items.next_page.name"
 
 # What each button in the inventory will look like. The "enchanted" setting will be ignored (only selected language will be enchanted)
-# %language% - The player's current language.
-# %name% - The language's name. Defined in its config file inside the "langs" folder.
-# %selected% - Displays whether the language is selected or not. See the "selected_placeholder" setting in the language file.
 # %flag% - Value set in the "flag" setting in the language's config file.
-# %code% - The language's code. For example: en_us.yml -> en_us
 language:
   material: PLAYER_HEAD
   head:
     base64: "%flag%"
-  name: "&6&l%name%"
-  lore:
-    - "&7%code%"
-    - "%selected%"
+  name: "inventory.items.language.name"
+  lore: "inventory.items.language.lore"
 
 # Item on the top left of the GUI
 # Useful to explain server rules.
@@ -45,7 +48,5 @@ info:
   material: PLAYER_HEAD
   head:
     base64: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDVkMjAzMzBkYTU5YzIwN2Q3ODM1MjgzOGU5MWE0OGVhMWU0MmI0NWE5ODkzMjI2MTQ0YjI1MWZlOWI5ZDUzNSJ9fX0="
-  name: "&9&lInformation"
-  lore:
-    - "&7Changes the language of some messages sent by plugins."
-    - "&bEnglish &7should still be used in public channels."
+  name: "inventory.items.info.name"
+  lore: "inventory.items.info.lore"

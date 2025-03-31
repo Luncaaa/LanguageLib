@@ -198,25 +198,29 @@ public interface MessagesManager {
     String getUnparsedMessage(Messageable messageable, String key);
 
     /**
-     * Gets the given message in the player's language as a legacy String.
+     * Gets the given message in the player's language as a legacy String.<br>
+     *
+     * The messages will be parsed (colors and player placeholders)
      * @param messageable To whom the message should be sent.
      * @param key The key of the message to get.
      * @param placeholders Parts of the text (keys of the map) that will be replaced with the values of said keys.
      * @return The unparsed message in the player's language.
      */
-    default String toLegacy(Messageable messageable, String key, Map<String, String> placeholders) {
-        return toLegacy(messageable, key, placeholders, true);
+    default String getMessageLegacy(Messageable messageable, String key, Map<String, String> placeholders) {
+        return getMessageLegacy(messageable, key, placeholders, true);
     }
 
     /**
-     * Gets the given message in the player's language as a legacy String.
+     * Gets the given message in the player's language as a legacy String.<br>
+     *
+     * The messages will be parsed (colors and player placeholders)
      * @param messageable To whom the message should be sent.
      * @param key The key of the message to get.
      * @param placeholders Parts of the text (keys of the map) that will be replaced with the values of said keys.
      * @param addPrefix Whether the prefix should be added at the beginning of the message.
      * @return The unparsed message in the player's language.
      */
-    String toLegacy(Messageable messageable, String key, Map<String, String> placeholders, boolean addPrefix);
+    String getMessageLegacy(Messageable messageable, String key, Map<String, String> placeholders, boolean addPrefix);
 
     /**
      * Gets the language data for the given CommandSender.

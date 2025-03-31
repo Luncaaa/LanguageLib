@@ -50,7 +50,7 @@ public class MessagesManagerImpl extends Manager<String, Language> implements Me
                 if (plugin.getMainConfig().ignoredLanguages.contains(Config.getNameWithoutExtension(lang.getFileName()))) {
                     continue;
                 }
-                Config.saveConfig(plugin, "langs", lang.getFileName());
+                Config.saveConfig(plugin, "langs" + File.separator + lang.getFileName());
             }
         }
 
@@ -155,11 +155,11 @@ public class MessagesManagerImpl extends Manager<String, Language> implements Me
     }
 
     @Override
-    public String toLegacy(Messageable messageable, String key, Map<String, String> placeholders, boolean addPrefix) {
+    public String getMessageLegacy(Messageable messageable, String key, Map<String, String> placeholders, boolean addPrefix) {
         return legacySerializer.serialize(getMessage(messageable, key, placeholders, addPrefix));
     }
 
-    public String toLegacy(Messageable messageable, String message, Map<String, String> placeholders) {
+    public String getMessageLegacy(Messageable messageable, String message, Map<String, String> placeholders) {
         return legacySerializer.serialize(parseMessage(messageable, message, placeholders, false));
     }
 
