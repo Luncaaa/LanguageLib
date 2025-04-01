@@ -26,16 +26,17 @@ public class APIImplementation implements LanguageAPI {
     /**
      * Forces the plugin to create a new MessagesManager.
      */
+    @Override
     public void reload() {
         this.messagesManager = new MessagesManagerImpl(languageLib, plugin, prefix, languagesFolderPath);
-    }
-
-    public void onLeave(Player player) {
-        ((MessagesManagerImpl) messagesManager).onLeave(player);
     }
 
     @Override
     public MessagesManager getMessagesManager() {
         return messagesManager;
+    }
+
+    public void onLeave(Player player) {
+        ((MessagesManagerImpl) messagesManager).onLeave(player);
     }
 }

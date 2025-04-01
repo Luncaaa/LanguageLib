@@ -6,7 +6,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 
 /**
- * LanguageLib' API class.
+ * LanguageLib's API class.
 */
 @SuppressWarnings("unused")
 public interface LanguageAPI {
@@ -20,6 +20,15 @@ public interface LanguageAPI {
     static LanguageAPI getInstance(Plugin plugin, String prefix, String languagesFolderPath) {
         return APIProvider.getImplementation().getAPI(plugin, prefix, languagesFolderPath);
     }
+
+    /**
+     * Reloads the API instance.<br>
+     *
+     * Use it when your plugin's reload command is used so that changes in language files are reflected.<br>
+     *
+     * The {@link MessagesManager} object retrieved from {@link LanguageAPI#getMessagesManager()} will be different after reloading!
+     */
+    void reload();
 
     /**
      * Gets the messages manager.<br>
