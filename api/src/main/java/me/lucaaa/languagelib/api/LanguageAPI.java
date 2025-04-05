@@ -22,25 +22,25 @@ public interface LanguageAPI {
     }
 
     /**
-     * Reloads the API instance.<br>
-     *
-     * Use it when your plugin's reload command is used so that changes in language files are reflected.<br>
-     *
-     * The {@link MessagesManager} object retrieved from {@link LanguageAPI#getMessagesManager()} will be different after reloading!
+     * Reloads the API instance.
+     * <p>
+     * Use it when your plugin's reload command is used so that changes in language files are reflected.
+     * <p>
+     * The {@link MessagesManager} object retrieved from {@link LanguageAPI#getMessagesManager()} and all {@link Messageable} objects will be different after reloading!
      */
     void reload();
 
     /**
-     * Gets the messages manager.<br>
-     *
+     * Gets the messages manager.
+     * <p>
      * This contains the list of languages and their messages.
      * @return The messages manager.
      */
     MessagesManager getMessagesManager();
 
     /**
-     * Gets the messageable data for a sender (player or console).<br>
-     *
+     * Gets the messageable data for a sender (player or console).
+     * <p>
      * This has the language necessary for getting messages.
      * @param sender The sender.
      * @return The messageable.
@@ -50,8 +50,8 @@ public interface LanguageAPI {
     }
 
     /**
-     * Gets the server's console as a messageable.<br>
-     *
+     * Gets the server's console as a messageable.
+     * <p>
      * Messages will be sent in the default language set in LanguageLib's config.yml file.
      * @return The server console as a messageable.
      */

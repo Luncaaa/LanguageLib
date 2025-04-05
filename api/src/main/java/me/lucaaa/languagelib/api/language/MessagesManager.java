@@ -1,7 +1,6 @@
 package me.lucaaa.languagelib.api.language;
 
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.util.List;
 import java.util.Map;
@@ -12,20 +11,20 @@ import java.util.Map;
 @SuppressWarnings("unused")
 public interface MessagesManager {
     /**
-     * Sends the given message to the player in his language. <br>
-     *
+     * Sends the given message to the sender in his language.
+     * <p>
      * The message will be parsed (colors and player placeholders).
-     * @param player To whom the message should be sent.
+     * @param sender To whom the message should be sent.
      * @param key The key of the message to send.
      * @param addPrefix Whether the prefix should be added at the beginning of the message.
      */
-    default void sendMessage(Player player, String key, boolean addPrefix) {
-        sendMessage(getMessageable(player), key, null, addPrefix);
+    default void sendMessage(CommandSender sender, String key, boolean addPrefix) {
+        sendMessage(getMessageable(sender), key, null, addPrefix);
     }
 
     /**
-     * Sends the given message to the player in his language. <br>
-     *
+     * Sends the given message to the sender in his language.
+     * <p>
      * The message will be parsed (colors and player placeholders).
      * @param messageable To whom the message should be sent.
      * @param key The key of the message to send.
@@ -36,19 +35,19 @@ public interface MessagesManager {
     }
 
     /**
-     * Sends the given message to the player in his language. <br>
-     *
+     * Sends the given message to the sender in his language.
+     * <p>
      * The message will be parsed (colors and player placeholders).
-     * @param player To whom the message should be sent.
+     * @param sender To whom the message should be sent.
      * @param key The key of the message to send.
      */
-    default void sendMessage(Player player, String key) {
-        sendMessage(getMessageable(player), key, null, true);
+    default void sendMessage(CommandSender sender, String key) {
+        sendMessage(getMessageable(sender), key, null, true);
     }
 
     /**
-     * Sends the given message to the player in his language. <br>
-     *
+     * Sends the given message to the sender in his language.
+     * <p>
      * The message will be parsed (colors and player placeholders).
      * @param messageable To whom the message should be sent.
      * @param key The key of the message to send.
@@ -58,20 +57,20 @@ public interface MessagesManager {
     }
 
     /**
-     * Sends the given message to the player in his language. <br>
-     *
+     * Sends the given message to the sender in his language.
+     * <p>
      * The message will be parsed (colors and player placeholders).
-     * @param player To whom the message should be sent.
+     * @param sender To whom the message should be sent.
      * @param key The key of the message to send.
      * @param placeholders Parts of the text (keys of the map) that will be replaced with the values of said keys.
      */
-    default void sendMessage(Player player, String key, Map<String, String> placeholders) {
-        sendMessage(getMessageable(player), key, placeholders, true);
+    default void sendMessage(CommandSender sender, String key, Map<String, String> placeholders) {
+        sendMessage(getMessageable(sender), key, placeholders, true);
     }
 
     /**
-     * Sends the given message to the player in his language. <br>
-     *
+     * Sends the given message to the sender in his language.
+     * <p>
      * The message will be parsed (colors and player placeholders).
      * @param messageable To whom the message should be sent.
      * @param key The key of the message to send.
@@ -82,21 +81,21 @@ public interface MessagesManager {
     }
 
     /**
-     * Sends the given message to the player in his language. <br>
-     *
+     * Sends the given message to the sender in his language.
+     * <p>
      * The message will be parsed (colors and player placeholders).
-     * @param player To whom the message should be sent.
+     * @param sender To whom the message should be sent.
      * @param key The key of the message to send.
      * @param placeholders Parts of the text (keys of the map) that will be replaced with the values of said keys.
      * @param addPrefix Whether the prefix should be added at the beginning of the message.
      */
-    default void sendMessage(Player player, String key, Map<String, String> placeholders, boolean addPrefix) {
-        sendMessage(getMessageable(player), key, placeholders, addPrefix);
+    default void sendMessage(CommandSender sender, String key, Map<String, String> placeholders, boolean addPrefix) {
+        sendMessage(getMessageable(sender), key, placeholders, addPrefix);
     }
 
     /**
-     * Sends the given message to the player in his language. <br>
-     *
+     * Sends the given message to the sender in his language.
+     * <p>
      * The message will be parsed (colors and player placeholders).
      * @param messageable To whom the message should be sent.
      * @param key The key of the message to send.
@@ -106,20 +105,20 @@ public interface MessagesManager {
     void sendMessage(Messageable messageable, String key, Map<String, String> placeholders, boolean addPrefix);
 
     /**
-     * Gets a list of messages from the language config.<br>
-     *
+     * Gets a list of messages from the language config.
+     * <p>
      * The messages will be parsed (colors and player placeholders)
-     * @param player For whom the list is being obtained (his language).
+     * @param sender For whom the list is being obtained (his language).
      * @param key The key of the list to get.
      * @return The list from the language config.
      */
-    default List<String> getList(Player player, String key) {
-        return getList(getMessageable(player), key, null);
+    default List<String> getList(CommandSender sender, String key) {
+        return getList(getMessageable(sender), key, null);
     }
 
     /**
-     * Gets a list of messages from the language config.<br>
-     *
+     * Gets a list of messages from the language config.
+     * <p>
      * The messages will be parsed (colors and player placeholders)
      * @param messageable For whom the list is being obtained (his language).
      * @param key The key of the list to get.
@@ -130,21 +129,21 @@ public interface MessagesManager {
     }
 
     /**
-     * Gets a list of messages from the language config.<br>
-     *
+     * Gets a list of messages from the language config.
+     * <p>
      * The messages will be parsed (colors and player placeholders)
-     * @param player For whom the list is being obtained (his language).
+     * @param sender For whom the list is being obtained (his language).
      * @param key The key of the list to get.
      * @param placeholders Parts of the text (keys of the map) that will be replaced with the values of said keys.
      * @return The list from the language config.
      */
-    default List<String> getList(Player player, String key, Map<String, String> placeholders) {
-        return getList(getMessageable(player), key, placeholders);
+    default List<String> getList(CommandSender sender, String key, Map<String, String> placeholders) {
+        return getList(getMessageable(sender), key, placeholders);
     }
 
     /**
-     * Gets a list of messages from the language config.<br>
-     *
+     * Gets a list of messages from the language config.
+     * <p>
      * The messages will be parsed (colors and player placeholders)
      * @param messageable For whom the list is being obtained (his language).
      * @param key The key of the list to get.
@@ -154,20 +153,20 @@ public interface MessagesManager {
     List<String> getList(Messageable messageable, String key, Map<String, String> placeholders);
 
     /**
-     * Gets a list of messages from the language config.<br>
-     *
+     * Gets a list of messages from the language config.
+     * <p>
      * The messages will NOT be parsed (colors and player placeholders)
-     * @param player For whom the list is being obtained (his language).
+     * @param sender For whom the list is being obtained (his language).
      * @param key The key of the list to get.
      * @return The list from the language config.
      */
-    default List<String> getUnparsedList(Player player, String key) {
-        return getUnparsedList(getMessageable(player), key);
+    default List<String> getUnparsedList(CommandSender sender, String key) {
+        return getUnparsedList(getMessageable(sender), key);
     }
 
     /**
-     * Gets a list of messages from the language config.<br>
-     *
+     * Gets a list of messages from the language config.
+     * <p>
      * The messages will NOT be parsed (colors and player placeholders)
      * @param messageable For whom the list is being obtained (his language).
      * @param key The key of the list to get.
@@ -176,49 +175,51 @@ public interface MessagesManager {
     List<String> getUnparsedList(Messageable messageable, String key);
 
     /**
-     * Sends the given message to the player in his language.<br>
-     *
+     * Sends the given message to the player in his language.
+     * <p>
      * The message will NOT be parsed (colors and player placeholders).
-     * @param player To whom the message should be sent.
+     * @param sender To whom the message should be sent.
      * @param key The key of the message to send.
      * @return The unparsed message in the player's language.
      */
-    default String getUnparsedMessage(Player player, String key) {
-        return getUnparsedMessage(getMessageable(player), key);
+    default String getUnparsedMessage(CommandSender sender, String key) {
+        return getUnparsedMessage(getMessageable(sender), key);
     }
 
     /**
-     * Sends the given message to the player in his language. <br>
-     *
+     * Gets the given message in the sender's language.
+     * <p>
      * The message will NOT be parsed (colors and player placeholders).
      * @param messageable To whom the message should be sent.
      * @param key The key of the message to send.
-     * @return The unparsed message in the player's language.
+     * @return The unparsed message in the sender's language.
      */
     String getUnparsedMessage(Messageable messageable, String key);
 
     /**
-     * Gets the given message in the player's language as a legacy String.<br>
-     *
+     * Gets the given message in the sender's language as a legacy String.
+     * <p>
+     * It is recommended to use {@link MessagesManager#sendMessage(CommandSender, String)} instead.
      * The messages will be parsed (colors and player placeholders)
      * @param messageable To whom the message should be sent.
      * @param key The key of the message to get.
      * @param placeholders Parts of the text (keys of the map) that will be replaced with the values of said keys.
-     * @return The unparsed message in the player's language.
+     * @return The message in the sender's language as a legacy String.
      */
     default String getMessageLegacy(Messageable messageable, String key, Map<String, String> placeholders) {
         return getMessageLegacy(messageable, key, placeholders, true);
     }
 
     /**
-     * Gets the given message in the player's language as a legacy String.<br>
-     *
+     * Gets the given message in the sender's language as a legacy String.
+     * <p>
+     * It is recommended to use {@link MessagesManager#sendMessage(CommandSender, String)} instead.
      * The messages will be parsed (colors and player placeholders)
      * @param messageable To whom the message should be sent.
      * @param key The key of the message to get.
      * @param placeholders Parts of the text (keys of the map) that will be replaced with the values of said keys.
      * @param addPrefix Whether the prefix should be added at the beginning of the message.
-     * @return The unparsed message in the player's language.
+     * @return The message in the sender's language as a legacy String.
      */
     String getMessageLegacy(Messageable messageable, String key, Map<String, String> placeholders, boolean addPrefix);
 
@@ -230,8 +231,8 @@ public interface MessagesManager {
     Messageable getMessageable(CommandSender sender);
 
     /**
-     * Gets the server's console as a messageable.<br>
-     *
+     * Gets the server's console as a messageable.
+     * <p>
      * Messages will be sent in the default language set in LanguageLib's config.yml file.
      * @return The server console as a messageable.
      */
