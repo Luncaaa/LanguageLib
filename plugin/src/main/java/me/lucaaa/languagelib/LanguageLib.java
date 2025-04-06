@@ -2,6 +2,7 @@ package me.lucaaa.languagelib;
 
 import me.lucaaa.languagelib.api.APIProvider;
 import me.lucaaa.languagelib.api.APIProviderImplementation;
+import me.lucaaa.languagelib.api.events.PluginReloadEvent;
 import me.lucaaa.languagelib.api.language.Messageable;
 import me.lucaaa.languagelib.commands.LanguageCommand;
 import me.lucaaa.languagelib.data.ServerConsole;
@@ -75,6 +76,8 @@ public final class LanguageLib extends JavaPlugin {
                 getManager(MessagesManagerImpl.class).sendMessage(reloader, "commands.reload.success", null);
             }
         });
+
+        getServer().getPluginManager().callEvent(new PluginReloadEvent());
     }
 
     @Override
@@ -85,7 +88,7 @@ public final class LanguageLib extends JavaPlugin {
         reloadConfigs(null);
 
         // Set up server console.
-        serverConsole = new ServerConsole(this, getServer().getConsoleSender());
+        serverConsole = new ServerConsole(this);
 
         // Register listeners.
         getServer().getPluginManager().registerEvents(new InventoryListeners(this), this);

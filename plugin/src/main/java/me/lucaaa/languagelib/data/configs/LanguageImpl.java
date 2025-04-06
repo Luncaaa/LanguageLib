@@ -1,19 +1,20 @@
 package me.lucaaa.languagelib.data.configs;
 
 import me.lucaaa.languagelib.LanguageLib;
+import me.lucaaa.languagelib.api.language.Language;
 import me.lucaaa.languagelib.managers.ItemsManager;
 
 import java.io.File;
 import java.util.*;
 import java.util.logging.Level;
 
-public class Language extends Config {
+public class LanguageImpl extends Config implements Language {
     private final Map<String, String> messages = new HashMap<>();
     private final Map<String, List<String>> lists = new HashMap<>();
     private final String name;
     private final String code;
 
-    public Language(LanguageLib plugin, String dataFolderPath, String languagesFolderPath, String fileName, boolean isNotAPI) {
+    public LanguageImpl(LanguageLib plugin, String dataFolderPath, String languagesFolderPath, String fileName, boolean isNotAPI) {
         super(plugin, dataFolderPath, languagesFolderPath + File.separator + fileName, false);
 
         this.name = config.getString("name", "No name set");
@@ -57,14 +58,17 @@ public class Language extends Config {
         return lists.get(key);
     }
 
+    @Override
     public String getFileName() {
         return file.getName();
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public String getCode() {
         return code;
     }

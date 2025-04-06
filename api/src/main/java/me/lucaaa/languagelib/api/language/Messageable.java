@@ -8,6 +8,12 @@ import java.util.Map;
 @SuppressWarnings("unused")
 public interface Messageable {
     /**
+     * Gets the sender's language.
+     * @return The sender's language.
+     */
+    Language getLanguage();
+
+    /**
      * Sends the given message to the player in his language. <br>
      *
      * The message will be parsed (colors and player placeholders).

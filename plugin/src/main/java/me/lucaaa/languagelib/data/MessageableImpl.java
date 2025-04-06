@@ -2,7 +2,7 @@ package me.lucaaa.languagelib.data;
 
 import me.lucaaa.languagelib.api.language.Messageable;
 import me.lucaaa.languagelib.api.language.MessagesManager;
-import me.lucaaa.languagelib.data.configs.Language;
+import me.lucaaa.languagelib.data.configs.LanguageImpl;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -31,7 +31,8 @@ public class MessageableImpl implements Messageable {
         return sender;
     }
 
-    public Language getLang() {
+    @Override
+    public LanguageImpl getLanguage() {
         return langProvider.getLang();
     }
 
@@ -41,8 +42,8 @@ public class MessageableImpl implements Messageable {
 
     public Map<String, String> getPlaceholders() {
         Map<String, String> placeholders = new HashMap<>();
-        placeholders.put("%language%", getLang().getName());
-        placeholders.put("%language_code%", getLang().getCode());
+        placeholders.put("%language%", getLanguage().getName());
+        placeholders.put("%language_code%", getLanguage().getCode());
         return placeholders;
     }
 }

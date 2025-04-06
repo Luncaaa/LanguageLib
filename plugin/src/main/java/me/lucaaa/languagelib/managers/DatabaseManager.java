@@ -5,7 +5,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import me.lucaaa.languagelib.LanguageLib;
 import me.lucaaa.languagelib.data.Database;
 import me.lucaaa.languagelib.data.PlayerData;
-import me.lucaaa.languagelib.data.configs.Language;
+import me.lucaaa.languagelib.data.configs.LanguageImpl;
 import org.bukkit.entity.Player;
 
 import java.io.File;
@@ -164,11 +164,11 @@ public class DatabaseManager {
                 createPlayer(playerName, language);
             }
 
-            Language lang = messagesManager.get(getLang(playerName), false);
+            LanguageImpl lang = messagesManager.get(getLang(playerName), false);
             if (lang == null) {
-                playerData.setLang(messagesManager.getDefaultLang(), false);
+                playerData.setLang(messagesManager.getDefaultLang(), true);
             } else {
-                playerData.setLang(lang, false);
+                playerData.setLang(lang, true);
             }
         };
 

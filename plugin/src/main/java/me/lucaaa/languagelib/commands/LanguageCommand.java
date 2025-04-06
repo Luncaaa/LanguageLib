@@ -3,7 +3,7 @@ package me.lucaaa.languagelib.commands;
 import me.lucaaa.languagelib.LanguageLib;
 import me.lucaaa.languagelib.api.language.Messageable;
 import me.lucaaa.languagelib.data.PlayerData;
-import me.lucaaa.languagelib.data.configs.Language;
+import me.lucaaa.languagelib.data.configs.LanguageImpl;
 import me.lucaaa.languagelib.inventory.LanguageInventory;
 import me.lucaaa.languagelib.managers.InventoriesManager;
 import me.lucaaa.languagelib.managers.MessagesManagerImpl;
@@ -66,7 +66,7 @@ public class LanguageCommand implements TabExecutor {
                 return true;
             }
 
-            Language language = messagesManager.get(args[0] + ".yml");
+            LanguageImpl language = messagesManager.get(args[0] + ".yml");
             Map<String, String> placeholders = new HashMap<>();
             placeholders.put("%language%", args[0]);
             if (language == null) {
@@ -75,7 +75,7 @@ public class LanguageCommand implements TabExecutor {
                 if (language.equals(playerData.getLang())) {
                     messageable.sendMessage("commands.language.already_selected", placeholders);
                 } else {
-                    playerData.setLang(language, true);
+                    playerData.setLang(language, false);
                     messageable.sendMessage("commands.language.success", placeholders);
                 }
             }

@@ -4,7 +4,7 @@ import me.lucaaa.languagelib.LanguageLib;
 import me.lucaaa.languagelib.api.language.Messageable;
 import me.lucaaa.languagelib.data.MessageableImpl;
 import me.lucaaa.languagelib.data.PlayerData;
-import me.lucaaa.languagelib.data.configs.Language;
+import me.lucaaa.languagelib.data.configs.LanguageImpl;
 import me.lucaaa.languagelib.managers.InventoriesManager;
 import me.lucaaa.languagelib.managers.ItemsManager;
 import me.lucaaa.languagelib.managers.MessagesManagerImpl;
@@ -31,7 +31,7 @@ public class LanguageInventory {
     private boolean loaded = false;
     private final Inventory inventory;
     protected final Messageable viewer;
-    private final List<Language> elements;
+    private final List<LanguageImpl> elements;
 
     private final int pageIndex;
     private final int rows;
@@ -47,7 +47,7 @@ public class LanguageInventory {
         this(plugin, viewer, 0, new ArrayList<>(plugin.getManager(MessagesManagerImpl.class).getLanguages()), null);
     }
 
-    public LanguageInventory(LanguageLib plugin, Messageable viewer, int pageIndex, List<Language> elements, LanguageInventory previous) {
+    public LanguageInventory(LanguageLib plugin, Messageable viewer, int pageIndex, List<LanguageImpl> elements, LanguageInventory previous) {
         this.plugin = plugin;
         this.itemsManager = plugin.getManager(ItemsManager.class);
         this.messagesManager = plugin.getManager(MessagesManagerImpl.class);
@@ -132,7 +132,7 @@ public class LanguageInventory {
         plugin.getManager(InventoriesManager.class).handleOpen(player, copy(pageIndex, previous));
     }
 
-    private InventoryButton parseButton(Language element) {
+    private InventoryButton parseButton(LanguageImpl element) {
         Map<String, String> placeholders = getPlaceholders();
         Player player = (Player) ((MessageableImpl) viewer).getSender();
         PlayerData playerData = plugin.getManager(PlayersManager.class).get(player);
@@ -169,7 +169,7 @@ public class LanguageInventory {
                 if (element.equals(playerData.getLang())) {
                     viewer.sendMessage("commands.language.already_selected", null);
                 } else {
-                    playerData.setLang(element, true);
+                    playerData.setLang(element, false);
                     reopen();
                     viewer.sendMessage("commands.language.success", null);
                 }

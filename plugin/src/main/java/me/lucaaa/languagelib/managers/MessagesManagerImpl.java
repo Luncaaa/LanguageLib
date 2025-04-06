@@ -4,7 +4,7 @@ import me.lucaaa.languagelib.LanguageLib;
 import me.lucaaa.languagelib.api.language.Messageable;
 import me.lucaaa.languagelib.api.language.MessagesManager;
 import me.lucaaa.languagelib.data.configs.Config;
-import me.lucaaa.languagelib.data.configs.Language;
+import me.lucaaa.languagelib.data.configs.LanguageImpl;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.lucaaa.languagelib.data.LangProvider;
 import me.lucaaa.languagelib.data.MessageableImpl;
@@ -27,9 +27,9 @@ import java.util.logging.Level;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class MessagesManagerImpl extends Manager<String, Language> implements MessagesManager {
+public class MessagesManagerImpl extends Manager<String, LanguageImpl> implements MessagesManager {
     private final String prefix;
-    private final Language defaultLang;
+    private final LanguageImpl defaultLang;
     private final String fullLanguageFolderPath;
 
     private final Map<CommandSender, Messageable> messageables = new HashMap<>();
@@ -84,7 +84,7 @@ public class MessagesManagerImpl extends Manager<String, Language> implements Me
                 }
             }
 
-            add(file.getName(), new Language(plugin, apiPlugin.getDataFolder().getAbsolutePath(), languagesFolderPath, file.getName(), isNotAPI));
+            add(file.getName(), new LanguageImpl(plugin, apiPlugin.getDataFolder().getAbsolutePath(), languagesFolderPath, file.getName(), isNotAPI));
         }
 
         if (values.isEmpty()) {
@@ -100,7 +100,7 @@ public class MessagesManagerImpl extends Manager<String, Language> implements Me
             }
         }
 
-        Language defLang;
+        LanguageImpl defLang;
         if (isNotAPI) {
             String defaultLang = plugin.getMainConfig().defaultLang;
             defLang = get(defaultLang);
@@ -111,7 +111,7 @@ public class MessagesManagerImpl extends Manager<String, Language> implements Me
         } else {
             defLang = get(plugin.getManager(MessagesManagerImpl.class).getDefaultLang().getFileName(), false);
             if (defLang == null) {
-                Optional<Language> first = values.values().stream().findFirst();
+                Optional<LanguageImpl> first = values.values().stream().findFirst();
                 if (first.isPresent()) {
                     defLang = first.get();
                 }
@@ -219,7 +219,7 @@ public class MessagesManagerImpl extends Manager<String, Language> implements Me
         return getMessageable(plugin.getServer().getConsoleSender());
     }
 
-    public Language getDefaultLang() {
+    public LanguageImpl getDefaultLang() {
         return defaultLang;
     }
 
@@ -227,7 +227,7 @@ public class MessagesManagerImpl extends Manager<String, Language> implements Me
         return values.keySet();
     }
 
-    public Collection<Language> getLanguages() {
+    public Collection<LanguageImpl> getLanguages() {
         return values.values();
     }
 
@@ -235,11 +235,11 @@ public class MessagesManagerImpl extends Manager<String, Language> implements Me
         return Pattern.matches("^[a-z]{2}_[a-z]{2}$", name);
     }
 
-    private Language getLanguage(Messageable messageable) {
+    private LanguageImpl getLanguage(Messageable messageable) {
         MessageableImpl messageableImpl = (MessageableImpl) messageable;
-        Language lang = get(messageableImpl.getLang().getFileName());
+        LanguageImpl lang = get(messageableImpl.getLanguage().getFileName());
         if (lang == null) {
-            Optional<Language> first = values.values().stream().findFirst();
+            Optional<LanguageImpl> first = values.values().stream().findFirst();
             if (first.isPresent()) {
                 return first.get();
             } else {
