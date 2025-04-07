@@ -4,17 +4,17 @@ import me.lucaaa.languagelib.LanguageLib;
 import me.lucaaa.languagelib.api.language.MessagesManager;
 import me.lucaaa.languagelib.managers.MessagesManagerImpl;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class APIImplementation implements LanguageAPI {
     private final LanguageLib languageLib;
-    private final Plugin plugin;
+    private final JavaPlugin plugin;
     private final String prefix;
     private final String languagesFolderPath;
 
     private MessagesManager messagesManager;
 
-    public APIImplementation(LanguageLib languageLib, Plugin plugin, String prefix, String languagesFolderPath) {
+    public APIImplementation(LanguageLib languageLib, JavaPlugin plugin, String prefix, String languagesFolderPath) {
         this.languageLib = languageLib;
         this.plugin = plugin;
         this.prefix = prefix;

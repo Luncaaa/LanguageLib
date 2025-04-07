@@ -27,6 +27,7 @@ public class MessageableImpl implements Messageable {
         messagesManager.sendMessage(this, key, placeholders, addPrefix);
     }
 
+    @Override
     public CommandSender getSender() {
         return sender;
     }
@@ -34,6 +35,11 @@ public class MessageableImpl implements Messageable {
     @Override
     public LanguageImpl getLanguage() {
         return langProvider.getLang();
+    }
+
+    @Override
+    public void sendColored(String message) {
+        messagesManager.sendColored(this, message);
     }
 
     public boolean isPlayer() {

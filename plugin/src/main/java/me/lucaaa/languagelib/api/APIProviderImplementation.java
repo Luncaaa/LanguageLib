@@ -3,6 +3,7 @@ package me.lucaaa.languagelib.api;
 import me.lucaaa.languagelib.LanguageLib;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,7 +17,7 @@ public class APIProviderImplementation extends APIProvider {
     }
 
     @Override
-    public APIImplementation getAPI(Plugin plugin, String prefix, String languagesFolderPath) {
+    public APIImplementation getAPI(JavaPlugin plugin, String prefix, String languagesFolderPath) {
         return apiMap.computeIfAbsent(plugin, p -> new APIImplementation(languageLib, plugin, prefix, languagesFolderPath));
     }
 

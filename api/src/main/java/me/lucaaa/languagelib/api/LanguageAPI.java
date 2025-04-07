@@ -3,7 +3,7 @@ package me.lucaaa.languagelib.api;
 import me.lucaaa.languagelib.api.language.Messageable;
 import me.lucaaa.languagelib.api.language.MessagesManager;
 import org.bukkit.command.CommandSender;
-import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 /**
  * LanguageLib's API class.
@@ -17,7 +17,7 @@ public interface LanguageAPI {
      * @param languagesFolderPath The path to the folder with your languages files (inside your plugin's configuration folder).
      * @return The instance of the API.
      */
-    static LanguageAPI getInstance(Plugin plugin, String prefix, String languagesFolderPath) {
+    static LanguageAPI getInstance(JavaPlugin plugin, String prefix, String languagesFolderPath) {
         return APIProvider.getImplementation().getAPI(plugin, prefix, languagesFolderPath);
     }
 

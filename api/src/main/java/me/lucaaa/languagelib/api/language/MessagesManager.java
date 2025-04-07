@@ -18,6 +18,26 @@ public interface MessagesManager {
     void reload();
 
     /**
+     * Sends the given message to the sender with colors.
+     * <p>
+     * Legacy color codes (&amp;) and minimessage will be parsed.
+     * @param sender To whom the message should be sent.
+     * @param message The message to send.
+     */
+    default void sendColored(CommandSender sender, String message) {
+        sendColored(getMessageable(sender), message);
+    }
+
+    /**
+     * Sends the given message to the sender with colors.
+     * <p>
+     * Legacy color codes (&amp;) and minimessage will be parsed.
+     * @param messageable To whom the message should be sent.
+     * @param message The message to send.
+     */
+    void sendColored(Messageable messageable, String message);
+
+    /**
      * Sends the given message to the sender in his language.
      * <p>
      * The message will be parsed (colors and player placeholders).

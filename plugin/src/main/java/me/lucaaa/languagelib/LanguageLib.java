@@ -55,12 +55,18 @@ public final class LanguageLib extends JavaPlugin {
 
         reload.thenRun(() -> {
             managers.put(ItemsManager.class, new ItemsManager(this, useNewHeads));
-            managers.put(MessagesManagerImpl.class, new MessagesManagerImpl(
-                    this,
-                    this,
-                    mainConfig.prefix,
-                    "langs"
-            ));
+
+            if (isRunning) {
+                getManager(MessagesManagerImpl.class).reload();
+            } else {
+                managers.put(MessagesManagerImpl.class, new MessagesManagerImpl(
+                        this,
+                        this,
+                        mainConfig.prefix,
+                        "langs"
+                ));
+            }
+
             managers.put(PlayersManager.class, new PlayersManager(this));
             managers.put(InventoriesManager.class, new InventoriesManager(this));
 

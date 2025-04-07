@@ -1,6 +1,6 @@
 package me.lucaaa.languagelib.api;
 
-import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 /**
  * INTERNAL USE ONLY - DO NOT USE!
@@ -24,5 +24,5 @@ public abstract class APIProvider {
         APIProvider.implementation = implementation;
     }
 
-    public abstract LanguageAPI getAPI(Plugin plugin, String prefix, String languagesFolderPath);
+    public abstract LanguageAPI getAPI(JavaPlugin plugin, String prefix, String languagesFolderPath);
 }

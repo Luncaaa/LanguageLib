@@ -1,5 +1,7 @@
 package me.lucaaa.languagelib.api.language;
 
+import org.bukkit.command.CommandSender;
+
 import java.util.Map;
 
 /**
@@ -8,10 +10,24 @@ import java.util.Map;
 @SuppressWarnings("unused")
 public interface Messageable {
     /**
+     * Gets the sender associated to this instance.
+     * @return The sender associated to this instance.
+     */
+    CommandSender getSender();
+
+    /**
      * Gets the sender's language.
      * @return The sender's language.
      */
     Language getLanguage();
+
+    /**
+     * Sends the given message to the sender with colors.
+     * <p>
+     * Legacy color codes (&amp;) and minimessage will be parsed.
+     * @param message The message to send.
+     */
+    void sendColored(String message);
 
     /**
      * Sends the given message to the player in his language. <br>

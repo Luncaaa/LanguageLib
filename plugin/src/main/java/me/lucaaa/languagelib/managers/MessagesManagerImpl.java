@@ -61,10 +61,17 @@ public class MessagesManagerImpl extends Manager<String, LanguageImpl> implement
     }
 
     @Override
+    public void sendColored(Messageable messageable, String message) {
+        Component msg = parseMessage(messageable, message, null, false);
+        BaseComponent[] component = bungeeSerializer.serialize(msg);
+        messageable.getSender().spigot().sendMessage(component);
+    }
+
+    @Override
     public void sendMessage(Messageable messageable, String key, Map<String, String> placeholders, boolean addPrefix) {
         Component message = getMessage(messageable, key, placeholders, addPrefix);
         BaseComponent[] component = bungeeSerializer.serialize(message);
-        ((MessageableImpl) messageable).getSender().spigot().sendMessage(component);
+        messageable.getSender().spigot().sendMessage(component);
     }
 
     @Override
