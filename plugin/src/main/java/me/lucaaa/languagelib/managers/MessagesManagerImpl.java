@@ -18,7 +18,7 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.nio.file.NotDirectoryException;
@@ -28,9 +28,13 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class MessagesManagerImpl extends Manager<String, LanguageImpl> implements MessagesManager {
-    private final String prefix;
-    private final LanguageImpl defaultLang;
+    private final JavaPlugin apiPlugin; // Used for the name of the plugin that "owns" this MessagesManagerImpl instance.
+    private final boolean isNotAPI;
+    private final String languagesFolderPath;
     private final String fullLanguageFolderPath;
+
+    private final String prefix;
+    private LanguageImpl defaultLang;
 
     private final Map<CommandSender, Messageable> messageables = new HashMap<>();
 
@@ -38,86 +42,15 @@ public class MessagesManagerImpl extends Manager<String, LanguageImpl> implement
     private final BungeeComponentSerializer bungeeSerializer = BungeeComponentSerializer.get();
     private final LegacyComponentSerializer legacySerializer = LegacyComponentSerializer.builder().hexColors().useUnusualXRepeatedCharacterHexFormat().build();
 
-    public MessagesManagerImpl(LanguageLib plugin, Plugin apiPlugin, String prefix, String languagesFolderPath) {
+    public MessagesManagerImpl(LanguageLib plugin, JavaPlugin apiPlugin, String prefix, String languagesFolderPath) {
         super(plugin);
-        this.prefix = prefix;
+        this.apiPlugin = apiPlugin;
+        this.isNotAPI = plugin.equals(apiPlugin);
+        this.languagesFolderPath = languagesFolderPath;
         this.fullLanguageFolderPath = apiPlugin.getDataFolder().getAbsolutePath() + File.separator + languagesFolderPath;
-        boolean isNotAPI = plugin.equals(apiPlugin);
+        this.prefix = prefix;
 
-        // Save default languages
-        if (isNotAPI) {
-            for (ProvidedConfig lang : ProvidedConfig.values()) {
-                if (plugin.getMainConfig().ignoredLanguages.contains(Config.getNameWithoutExtension(lang.getFileName()))) {
-                    continue;
-                }
-                Config.saveConfig(plugin, "langs" + File.separator + lang.getFileName());
-            }
-        }
-
-        String errorMessage = "No files found in directory";
-        File langDir = new File(fullLanguageFolderPath);
-        if (!langDir.exists() || !langDir.isDirectory()) {
-            plugin.logError(
-                    Level.SEVERE,
-                    "Plugin \"" + apiPlugin.getName() + "\" provided an invalid directory.",
-                    new NotDirectoryException("Not a valid directory: " + fullLanguageFolderPath));
-        }
-
-        for (File file : Objects.requireNonNull(langDir.listFiles())) {
-            String name = Config.getNameWithoutExtension(file);
-
-            if (plugin.getMainConfig().ignoredLanguages.contains(name)) {
-                continue;
-            }
-
-            if (!isValidName(name)) {
-                errorMessage = "Files were found but with invalid name";
-                logError(apiPlugin.getName(), fullLanguageFolderPath, "Invalid name - It must have the following format: \"xx_xx\", where \"x\" is a lower-case letter.");
-                continue;
-            }
-
-            if (!isNotAPI) {
-                Set<String> pluginLanguages = plugin.getManager(this.getClass()).getLanguagesNames();
-                if (!pluginLanguages.contains(file.getName())) {
-                    logError(apiPlugin.getName(), file.getAbsolutePath(), plugin.getName() + " doesn't have such language and it isn't ignored in the config file.");
-                    continue;
-                }
-            }
-
-            add(file.getName(), new LanguageImpl(plugin, apiPlugin.getDataFolder().getAbsolutePath(), languagesFolderPath, file.getName(), isNotAPI));
-        }
-
-        if (values.isEmpty()) {
-            plugin.logError(Level.SEVERE, errorMessage, new NoLanguagesFoundException("No valid languages were found in " + fullLanguageFolderPath));
-        } else {
-            if (!isNotAPI) {
-                Set<String> pluginLanguages = plugin.getManager(this.getClass()).getLanguagesNames();
-                for (String lang : pluginLanguages) {
-                    if (get(lang, false) == null) {
-                        logError(apiPlugin.getName(), fullLanguageFolderPath, plugin.getName() + " has the language \"" + lang + "\", but \"" + apiPlugin.getName() + "\" doesn't have it." );
-                    }
-                }
-            }
-        }
-
-        LanguageImpl defLang;
-        if (isNotAPI) {
-            String defaultLang = plugin.getMainConfig().defaultLang;
-            defLang = get(defaultLang);
-            if (defLang == null) {
-                defLang = get(ProvidedConfig.EN_US.getFileName());
-                plugin.log(Level.WARNING, "Default language file \"" + defaultLang + "\" was not found. Switching to \"" + defLang + "\".");
-            }
-        } else {
-            defLang = get(plugin.getManager(MessagesManagerImpl.class).getDefaultLang().getFileName(), false);
-            if (defLang == null) {
-                Optional<LanguageImpl> first = values.values().stream().findFirst();
-                if (first.isPresent()) {
-                    defLang = first.get();
-                }
-            }
-        }
-        this.defaultLang = defLang;
+        reload();
     }
 
     public void sendMessage(CommandSender sender, String message, boolean addPrefix) {
@@ -231,8 +164,8 @@ public class MessagesManagerImpl extends Manager<String, LanguageImpl> implement
         return values.values();
     }
 
-    private boolean isValidName(String name) {
-        return Pattern.matches("^[a-z]{2}_[a-z]{2}$", name);
+    private boolean isNameNotValid(String name) {
+        return !Pattern.matches("^[a-z]{2}_[a-z]{2}$", name);
     }
 
     private LanguageImpl getLanguage(Messageable messageable) {
@@ -254,11 +187,94 @@ public class MessagesManagerImpl extends Manager<String, LanguageImpl> implement
         messageables.remove(player);
     }
 
-    private void logError(String pluginName, String pathToLang, String error) {
+    private void logError(String pathToLang, String error) {
         plugin.log(Level.WARNING, "=========================");
-        plugin.log(Level.SEVERE, "Plugin \"" + pluginName + "\" caused an error when processing a language.");
-        plugin.log(Level.WARNING, "Path to file: " + pathToLang);
+        plugin.log(Level.SEVERE, "Plugin \"" + apiPlugin.getName() + "\" caused an error when processing a language.");
+        if (pathToLang != null) {
+            plugin.log(Level.WARNING, "Path to file: " + pathToLang);
+        }
         plugin.log(Level.WARNING, "Error: " + error);
         plugin.log(Level.WARNING, "=========================");
+    }
+
+    @Override
+    public void reload() {
+        // Save default languages
+        if (isNotAPI) {
+            for (ProvidedConfig lang : ProvidedConfig.values()) {
+                if (plugin.getMainConfig().ignoredLanguages.contains(Config.getNameWithoutExtension(lang.getFileName()))) {
+                    continue;
+                }
+                Config.saveConfig(plugin, "langs" + File.separator + lang.getFileName());
+            }
+        }
+
+        String errorMessage = "No files found in directory";
+        File langDir = new File(fullLanguageFolderPath);
+        if (!langDir.exists() || !langDir.isDirectory()) {
+            plugin.logError(
+                    Level.SEVERE,
+                    "Plugin \"" + apiPlugin.getName() + "\" provided an invalid directory.",
+                    new NotDirectoryException("Not a valid directory: " + fullLanguageFolderPath));
+        }
+
+        for (File file : Objects.requireNonNull(langDir.listFiles())) {
+            String name = Config.getNameWithoutExtension(file);
+
+            if (plugin.getMainConfig().ignoredLanguages.contains(name)) {
+                continue;
+            }
+
+            if (isNameNotValid(name)) {
+                errorMessage = "Files were found but with invalid name";
+                logError(fullLanguageFolderPath, "Invalid name - It must have the following format: \"xx_xx\", where \"x\" is a lower-case letter.");
+                continue;
+            }
+
+            if (!isNotAPI) {
+                Set<String> pluginLanguages = plugin.getManager(this.getClass()).getLanguagesNames();
+                if (!pluginLanguages.contains(file.getName())) {
+                    logError(file.getAbsolutePath(), plugin.getName() + " doesn't have such language and it isn't ignored in the config file.");
+                    continue;
+                }
+            }
+
+            add(file.getName(), new LanguageImpl(plugin, apiPlugin, languagesFolderPath, file.getName()));
+        }
+
+        // If the plugin has no languages or has more languages than LanguageLib, log a warning.
+        if (values.isEmpty()) {
+            plugin.logError(Level.SEVERE, errorMessage, new NoLanguagesFoundException("No valid languages were found in " + fullLanguageFolderPath));
+
+        } else if (!isNotAPI) {
+            for (String lang : plugin.getManager(this.getClass()).getLanguagesNames()) {
+                if (get(lang, false) == null) {
+                    logError(fullLanguageFolderPath, plugin.getName() + " has the language \"" + lang + "\", but \"" + apiPlugin.getName() + "\" doesn't have it." );
+                }
+            }
+        }
+
+        // Sets the default language. If it's the plugin's manager, fetch it from the config file.
+        // If it's an API manager, try to set it to the plugin's default language.
+        LanguageImpl defLang;
+        String defLangName;
+        if (isNotAPI) {
+            defLangName = plugin.getMainConfig().defaultLang;
+        } else {
+            defLangName = plugin.getManager(MessagesManagerImpl.class).getDefaultLang().getFileName();
+        }
+
+        defLang = get(defLangName, false);
+
+        // If the default language is not found, use the first file found.
+        if (defLang == null) {
+            Optional<LanguageImpl> first = values.values().stream().findFirst();
+            if (first.isPresent()) {
+                defLang = first.get();
+                logError(null, "Default language file \"" + defLangName + "\" was not found. Switching to \"" + defLang + "\".");
+            }
+        }
+
+        this.defaultLang = defLang;
     }
 }

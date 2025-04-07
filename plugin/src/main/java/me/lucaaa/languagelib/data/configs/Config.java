@@ -3,6 +3,7 @@ package me.lucaaa.languagelib.data.configs;
 import me.lucaaa.languagelib.LanguageLib;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,12 +16,12 @@ public class Config {
     protected final YamlConfiguration config;
 
     public Config(LanguageLib plugin, String path, boolean createIfNotExists) {
-        this(plugin, plugin.getDataFolder().getAbsolutePath(), path, createIfNotExists);
+        this(plugin, plugin, path, createIfNotExists);
     }
 
-    public Config(LanguageLib plugin, String dataFolderPath, String path, boolean createIfNotExists) {
+    public Config(LanguageLib plugin, JavaPlugin apiPlugin, String path, boolean createIfNotExists) {
         this.plugin = plugin;
-        this.file = new File(dataFolderPath + File.separator + path);
+        this.file = new File(apiPlugin.getDataFolder().getAbsolutePath() + File.separator + path);
 
         if (!file.exists() && createIfNotExists) {
             plugin.saveResource(path, false);

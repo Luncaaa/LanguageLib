@@ -11,6 +11,13 @@ import java.util.Map;
 @SuppressWarnings("unused")
 public interface MessagesManager {
     /**
+     * Reloads the API instance.
+     * <p>
+     * Use it when your plugin's reload command is used so that changes in language files are reflected.
+     */
+    void reload();
+
+    /**
      * Sends the given message to the sender in his language.
      * <p>
      * The message will be parsed (colors and player placeholders).

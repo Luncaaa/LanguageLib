@@ -18,7 +18,7 @@ public class ItemConfig extends Config {
     private final Map<String, Item> items = new HashMap<>();
 
     public ItemConfig(LanguageLib plugin, boolean useNewHeads) {
-        super(plugin, "items.yml", false);
+        super(plugin, "items.yml", true);
         this.useNewHeads = useNewHeads;
 
         // Each key that is not a config section is added to the map along with its corresponding message
