@@ -30,9 +30,9 @@ subprojects {
 
     dependencies {
         compileOnly("org.spigotmc:spigot-api:1.13.2-R0.1-SNAPSHOT")
-        implementation("net.kyori:adventure-api:4.20.0")
-        implementation("net.kyori:adventure-text-minimessage:4.20.0")
-        implementation("net.kyori:adventure-text-serializer-legacy:4.20.0")
-        implementation("net.kyori:adventure-platform-bungeecord:4.3.4")
+        implementation("net.kyori:adventure-api:4.21.0")
+        implementation("net.kyori:adventure-text-minimessage:4.21.0")
+        implementation("net.kyori:adventure-text-serializer-legacy:4.21.0")
+        implementation("net.kyori:adventure-platform-bungeecord:4.4.0")
     }
 }
