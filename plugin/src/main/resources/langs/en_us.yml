@@ -6,10 +6,18 @@ commands:
   main:
     player_command_only: "&cOnly players can execute this command!"
     no_permission: "&cYou don't have permission to execute this command!"
+    command_usage: "&7Correct usage: &c%usage%"
+    not_enough_arguments: "&cYou need to enter more arguments to run this command!"
 
   # Reload subcommand
   reload:
+    description: "Reloads the plugin"
     success: "&aThe plugin has been reloaded successfully!"
+
+  # Help subcommand
+  help:
+    description: "Shows commands information"
+    introduction: "&cCommands: &7&o([] - mandatory args, <> - optional args)"
 
   # Language subcommand
   # %language% - The language param entered by the player (if applicable)

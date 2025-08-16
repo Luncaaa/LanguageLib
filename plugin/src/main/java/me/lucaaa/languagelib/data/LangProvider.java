@@ -1,7 +1,7 @@
 package me.lucaaa.languagelib.data;
 
-import me.lucaaa.languagelib.data.configs.LanguageImpl;
+import me.lucaaa.languagelib.api.language.Language;
 
 public interface LangProvider {
-    LanguageImpl getLang();
+    Language getLang();
 }

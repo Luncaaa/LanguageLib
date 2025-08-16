@@ -3,10 +3,8 @@ package me.lucaaa.languagelib.managers;
 import me.lucaaa.languagelib.LanguageLib;
 import me.lucaaa.languagelib.inventory.LanguageInventory;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.inventory.Inventory;
 
 public class InventoriesManager extends Manager<Player, LanguageInventory> {
     public InventoriesManager(LanguageLib plugin) {
@@ -20,14 +18,15 @@ public class InventoriesManager extends Manager<Player, LanguageInventory> {
     }
 
     public void handleClick(InventoryClickEvent event) {
+        if (event.getClickedInventory() == null || event.getClickedInventory().getType() == InventoryType.PLAYER) {
+            return;
+        }
+
         Player player = (Player) event.getWhoClicked();
         if (!values.containsKey(player)) return;
 
-        Inventory clickedInventory = event.getClickedInventory();
-        if (clickedInventory != null && clickedInventory.getType() == InventoryType.PLAYER && event.getAction() != InventoryAction.MOVE_TO_OTHER_INVENTORY) return;
-
         event.setCancelled(true);
-        get(player).onClick(event);
+        values.get(player).onClick(event);
     }
 
     public void handleClose(Player player) {

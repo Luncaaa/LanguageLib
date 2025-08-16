@@ -7,10 +7,6 @@ import org.bukkit.entity.Player;
 public class PlayersManager extends Manager<Player, PlayerData> {
     public PlayersManager(LanguageLib plugin) {
         super(plugin);
-
-        for (Player player : plugin.getServer().getOnlinePlayers()) {
-            addPlayer(player);
-        }
     }
 
     public void addPlayer(Player player) {
@@ -22,5 +18,11 @@ public class PlayersManager extends Manager<Player, PlayerData> {
             plugin.getManager(MessagesManagerImpl.class).onLeave(player);
             plugin.getApiProvider().onLeave(player);
         });
+    }
+
+    public void reload() {
+        for (PlayerData playerData : values.values()) {
+            playerData.reload();
+        }
     }
 }

@@ -12,6 +12,11 @@ commands:
     aliases: [lang]
 
 permissions:
+  lang.admin:
+    description: Admin permission - Allows everything
+    default: op
+    children:
+      lang.reload: true
   lang.reload:
     description: Reloads the plugin's configuration files.
     default: op

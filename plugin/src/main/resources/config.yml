@@ -11,7 +11,7 @@ database:
   # If false, a local database will be generated in the plugins/LanguageLib folder
   use_mysql: false
   mysql:
-    name: "au_players_data"
+    name: "language_data"
     host: "localhost"
     port: "3306"
     username: "root"

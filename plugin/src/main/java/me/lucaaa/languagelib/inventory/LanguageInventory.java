@@ -2,7 +2,6 @@ package me.lucaaa.languagelib.inventory;
 
 import me.lucaaa.languagelib.LanguageLib;
 import me.lucaaa.languagelib.api.language.Messageable;
-import me.lucaaa.languagelib.data.MessageableImpl;
 import me.lucaaa.languagelib.data.PlayerData;
 import me.lucaaa.languagelib.data.configs.LanguageImpl;
 import me.lucaaa.languagelib.managers.InventoriesManager;
@@ -128,13 +127,13 @@ public class LanguageInventory {
     }
 
     protected void reopen() {
-        Player player = (Player) ((MessageableImpl) viewer).getSender();
+        Player player = (Player) viewer.getSender();
         plugin.getManager(InventoriesManager.class).handleOpen(player, copy(pageIndex, previous));
     }
 
     private InventoryButton parseButton(LanguageImpl element) {
         Map<String, String> placeholders = getPlaceholders();
-        Player player = (Player) ((MessageableImpl) viewer).getSender();
+        Player player = (Player) viewer.getSender();
         PlayerData playerData = plugin.getManager(PlayersManager.class).get(player);
 
         String selected;

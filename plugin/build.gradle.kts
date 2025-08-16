@@ -8,7 +8,7 @@ repositories {
 
 dependencies {
     compileOnly("me.clip:placeholderapi:2.11.6")
-    implementation("com.zaxxer:HikariCP:6.3.0")
+    implementation("com.zaxxer:HikariCP:7.0.1")
 
     implementation(project(":api"))
     implementation(project(":v1_18_R1"))

@@ -179,9 +179,8 @@ public class MessagesManagerImpl extends Manager<String, LanguageImpl> implement
         MessageableImpl messageableImpl = (MessageableImpl) messageable;
         LanguageImpl lang = get(messageableImpl.getLanguage().getFileName());
         if (lang == null) {
-            Optional<LanguageImpl> first = values.values().stream().findFirst();
-            if (first.isPresent()) {
-                return first.get();
+            if (defaultLang != null) {
+                return defaultLang;
             } else {
                 throw new NoLanguagesFoundException("No valid languages in " + fullLanguageFolderPath);
             }
@@ -206,6 +205,8 @@ public class MessagesManagerImpl extends Manager<String, LanguageImpl> implement
 
     @Override
     public void reload() {
+        shutdown();
+
         // Save default languages
         if (isNotAPI) {
             for (ProvidedConfig lang : ProvidedConfig.values()) {
@@ -279,6 +280,8 @@ public class MessagesManagerImpl extends Manager<String, LanguageImpl> implement
             if (first.isPresent()) {
                 defLang = first.get();
                 logError(null, "Default language file \"" + defLangName + "\" was not found. Switching to \"" + defLang + "\".");
+            } else {
+                throw new NoLanguagesFoundException("No valid languages in " + fullLanguageFolderPath);
             }
         }
 

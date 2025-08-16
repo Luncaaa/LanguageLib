@@ -14,7 +14,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
 public final class LanguageLib extends JavaPlugin {
@@ -40,40 +39,16 @@ public final class LanguageLib extends JavaPlugin {
         mainConfig = new MainConfig(this);
 
         // Managers
-        Runnable startDB = () -> databaseManager = new DatabaseManager(this, mainConfig.database.useMySQL);
-        CompletableFuture<Void> reload = CompletableFuture.supplyAsync(() -> null);
+        if (!isRunning) {
+            initManagers();
 
-        if (isRunning) {
-            getManager(InventoriesManager.class).shutdown();
-            reload = CompletableFuture.runAsync(() -> {
-                databaseManager.closePool();
-                startDB.run();
-            });
         } else {
-            startDB.run();
-        }
-
-        reload.thenRun(() -> {
-            managers.put(ItemsManager.class, new ItemsManager(this, useNewHeads));
-
-            if (isRunning) {
-                getManager(MessagesManagerImpl.class).reload();
-            } else {
-                managers.put(MessagesManagerImpl.class, new MessagesManagerImpl(
-                        this,
-                        this,
-                        mainConfig.prefix,
-                        "langs"
-                ));
+            if (managers.containsKey(InventoriesManager.class)) {
+                getManager(InventoriesManager.class).shutdown();
             }
 
-            managers.put(PlayersManager.class, new PlayersManager(this));
-            managers.put(InventoriesManager.class, new InventoriesManager(this));
-
-            // API must be reloaded after previous managers have been reloaded.
-            if (isRunning) {
-                apiProvider.reload();
-            }
+            databaseManager.shutdown(false);
+            initManagers();
 
             // Once all managers have been loaded (including database), send success message if applicable.
             if (reloader != null) {
@@ -81,9 +56,37 @@ public final class LanguageLib extends JavaPlugin {
                 // language files are used instead of the ones before reloading (they might have changes).
                 getManager(MessagesManagerImpl.class).sendMessage(reloader, "commands.reload.success", null);
             }
-        });
 
-        getServer().getPluginManager().callEvent(new PluginReloadEvent());
+            getServer().getPluginManager().callEvent(new PluginReloadEvent());
+        }
+    }
+
+    private void initManagers() {
+        databaseManager = new DatabaseManager(this);
+
+        managers.put(ItemsManager.class, new ItemsManager(this, useNewHeads));
+
+        if (isRunning) {
+            getManager(MessagesManagerImpl.class).reload();
+            getManager(PlayersManager.class).reload();
+
+        } else {
+            managers.put(MessagesManagerImpl.class, new MessagesManagerImpl(
+                    this,
+                    this,
+                    mainConfig.prefix,
+                    "langs"
+            ));
+
+            managers.put(PlayersManager.class, new PlayersManager(this));
+        }
+
+        managers.put(InventoriesManager.class, new InventoriesManager(this));
+
+        // API must be reloaded after previous managers have been reloaded.
+        if (isRunning) {
+            apiProvider.reload();
+        }
     }
 
     @Override
@@ -114,7 +117,8 @@ public final class LanguageLib extends JavaPlugin {
     @Override
     public void onDisable() {
         getManager(InventoriesManager.class).shutdown();
-        databaseManager.closePool();
+        if (databaseManager != null) databaseManager.shutdown(true);
+        isRunning = false;
     }
 
     private boolean useNewHeads(String version) {
