@@ -102,6 +102,11 @@ public class MessagesManagerImpl extends Manager<String, LanguageImpl> implement
         return getLanguage(messageable).getMessage(key);
     }
 
+    @Override
+    public String getMessageMinimessage(Messageable messageable, String key, Map<String, String> placeholders, boolean addPrefix) {
+        return miniMessage.serialize(getMessage(messageable, key, placeholders, addPrefix));
+    }
+
     private Component getMessage(Messageable messageable, String key, Map<String, String> placeholders, boolean addPrefix) {
         return parseMessage(messageable, getLanguage(messageable).getMessage(key), placeholders, addPrefix);
     }
@@ -109,10 +114,6 @@ public class MessagesManagerImpl extends Manager<String, LanguageImpl> implement
     @Override
     public String getMessageLegacy(Messageable messageable, String key, Map<String, String> placeholders, boolean addPrefix) {
         return legacySerializer.serialize(getMessage(messageable, key, placeholders, addPrefix));
-    }
-
-    public String getMessageLegacy(Messageable messageable, String message, Map<String, String> placeholders) {
-        return legacySerializer.serialize(parseMessage(messageable, message, placeholders, false));
     }
 
     private Component parseMessage(Messageable messageable, String message, Map<String, String> placeholders, boolean addPrefix) {

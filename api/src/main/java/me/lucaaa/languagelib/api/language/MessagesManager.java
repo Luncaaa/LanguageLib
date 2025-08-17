@@ -224,6 +224,128 @@ public interface MessagesManager {
     String getUnparsedMessage(Messageable messageable, String key);
 
     /**
+     * Gets the given message in the sender's language as a String with minimessage format.
+     * <p>
+     * It is recommended to use {@link MessagesManager#sendMessage(CommandSender, String)} instead.
+     * The messages will be parsed (colors and player placeholders)
+     * @param sender To whom the message should be sent.
+     * @param key The key of the message to get.
+     * @return The message in the sender's language as String with minimessage format.
+     */
+    default String getMessageMinimessage(CommandSender sender, String key) {
+        return getMessageLegacy(getMessageable(sender), key, null, true);
+    }
+
+    /**
+     * Gets the given message in the sender's language as a String with minimessage format.
+     * <p>
+     * It is recommended to use {@link MessagesManager#sendMessage(CommandSender, String)} instead.
+     * The messages will be parsed (colors and player placeholders)
+     * @param messageable To whom the message should be sent.
+     * @param key The key of the message to get.
+     * @return The message in the sender's language as String with minimessage format.
+     */
+    default String getMessageMinimessage(Messageable messageable, String key) {
+        return getMessageMinimessage(messageable, key, null, true);
+    }
+
+    /**
+     * Gets the given message in the sender's language as a String with minimessage format.
+     * <p>
+     * It is recommended to use {@link MessagesManager#sendMessage(CommandSender, String)} instead.
+     * The messages will be parsed (colors and player placeholders)
+     * @param sender To whom the message should be sent.
+     * @param key The key of the message to get.
+     * @param placeholders Parts of the text (keys of the map) that will be replaced with the values of said keys.
+     * @return The message in the sender's language as String with minimessage format.
+     */
+    default String getMessageMinimessage(CommandSender sender, String key, Map<String, String> placeholders) {
+        return getMessageMinimessage(getMessageable(sender), key, placeholders, true);
+    }
+
+    /**
+     * Gets the given message in the sender's language as a String with minimessage format.
+     * <p>
+     * It is recommended to use {@link MessagesManager#sendMessage(CommandSender, String)} instead.
+     * The messages will be parsed (colors and player placeholders)
+     * @param messageable To whom the message should be sent.
+     * @param key The key of the message to get.
+     * @param placeholders Parts of the text (keys of the map) that will be replaced with the values of said keys.
+     * @return The message in the sender's language as String with minimessage format.
+     */
+    default String getMessageMinimessage(Messageable messageable, String key, Map<String, String> placeholders) {
+        return getMessageMinimessage(messageable, key, placeholders, true);
+    }
+
+    /**
+     * Gets the given message in the sender's language as a String with minimessage format.
+     * <p>
+     * It is recommended to use {@link MessagesManager#sendMessage(CommandSender, String)} instead.
+     * The messages will be parsed (colors and player placeholders)
+     * @param sender To whom the message should be sent.
+     * @param key The key of the message to get.
+     * @param placeholders Parts of the text (keys of the map) that will be replaced with the values of said keys.
+     * @param addPrefix Whether the prefix should be added at the beginning of the message.
+     * @return The message in the sender's language as String with minimessage format.
+     */
+    default String getMessageMinimessage(CommandSender sender, String key, Map<String, String> placeholders, boolean addPrefix) {
+        return getMessageMinimessage(getMessageable(sender), key, placeholders, addPrefix);
+    }
+
+    /**
+     * Gets the given message in the sender's language as a String with minimessage format.
+     * <p>
+     * It is recommended to use {@link MessagesManager#sendMessage(CommandSender, String)} instead.
+     * The messages will be parsed (colors and player placeholders)
+     * @param messageable To whom the message should be sent.
+     * @param key The key of the message to get.
+     * @param placeholders Parts of the text (keys of the map) that will be replaced with the values of said keys.
+     * @param addPrefix Whether the prefix should be added at the beginning of the message.
+     * @return The message in the sender's language as String with minimessage format.
+     */
+    String getMessageMinimessage(Messageable messageable, String key, Map<String, String> placeholders, boolean addPrefix);
+
+    /**
+     * Gets the given message in the sender's language as a legacy String.
+     * <p>
+     * It is recommended to use {@link MessagesManager#sendMessage(CommandSender, String)} instead.
+     * The messages will be parsed (colors and player placeholders)
+     * @param sender To whom the message should be sent.
+     * @param key The key of the message to get.
+     * @return The message in the sender's language as a legacy String.
+     */
+    default String getMessageLegacy(CommandSender sender, String key) {
+        return getMessageLegacy(getMessageable(sender), key, null, true);
+    }
+
+    /**
+     * Gets the given message in the sender's language as a legacy String.
+     * <p>
+     * It is recommended to use {@link MessagesManager#sendMessage(CommandSender, String)} instead.
+     * The messages will be parsed (colors and player placeholders)
+     * @param messageable To whom the message should be sent.
+     * @param key The key of the message to get.
+     * @return The message in the sender's language as a legacy String.
+     */
+    default String getMessageLegacy(Messageable messageable, String key) {
+        return getMessageLegacy(messageable, key, null, true);
+    }
+
+    /**
+     * Gets the given message in the sender's language as a legacy String.
+     * <p>
+     * It is recommended to use {@link MessagesManager#sendMessage(CommandSender, String)} instead.
+     * The messages will be parsed (colors and player placeholders)
+     * @param sender To whom the message should be sent.
+     * @param key The key of the message to get.
+     * @param placeholders Parts of the text (keys of the map) that will be replaced with the values of said keys.
+     * @return The message in the sender's language as a legacy String.
+     */
+    default String getMessageLegacy(CommandSender sender, String key, Map<String, String> placeholders) {
+        return getMessageLegacy(getMessageable(sender), key, placeholders, true);
+    }
+
+    /**
      * Gets the given message in the sender's language as a legacy String.
      * <p>
      * It is recommended to use {@link MessagesManager#sendMessage(CommandSender, String)} instead.
@@ -235,6 +357,21 @@ public interface MessagesManager {
      */
     default String getMessageLegacy(Messageable messageable, String key, Map<String, String> placeholders) {
         return getMessageLegacy(messageable, key, placeholders, true);
+    }
+
+    /**
+     * Gets the given message in the sender's language as a legacy String.
+     * <p>
+     * It is recommended to use {@link MessagesManager#sendMessage(CommandSender, String)} instead.
+     * The messages will be parsed (colors and player placeholders)
+     * @param sender To whom the message should be sent.
+     * @param key The key of the message to get.
+     * @param placeholders Parts of the text (keys of the map) that will be replaced with the values of said keys.
+     * @param addPrefix Whether the prefix should be added at the beginning of the message.
+     * @return The message in the sender's language as a legacy String.
+     */
+    default String getMessageLegacy(CommandSender sender, String key, Map<String, String> placeholders, boolean addPrefix) {
+        return getMessageLegacy(getMessageable(sender), key, placeholders, addPrefix);
     }
 
     /**

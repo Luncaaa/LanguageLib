@@ -113,6 +113,11 @@ public final class LanguageLib extends JavaPlugin {
         APIProvider.setImplementation(apiProvider);
         audiences = BukkitAudiences.create(this);
 
+        // Add PAPI support.
+        if (isPapiInstalled) {
+            new PlaceholdersManager(this).register();
+        }
+
         isRunning = true;
         getManager(PluginMessagesManager.class).sendMessage(getServer().getConsoleSender(), "&aThe plugin has been successfully enabled! &7Version: " + getDescription().getVersion(), true);
     }
