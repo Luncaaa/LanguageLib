@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 
 public class MessagesManagerImpl extends Manager<String, LanguageImpl> implements MessagesManager {
     private final JavaPlugin apiPlugin; // Used for the name of the plugin that "owns" this MessagesManagerImpl instance.
-    private final boolean isAPI;
     private final boolean isMain;
     private final String languagesFolderPath;
     protected final String fullLanguageFolderPath;
@@ -46,7 +45,6 @@ public class MessagesManagerImpl extends Manager<String, LanguageImpl> implement
     public MessagesManagerImpl(LanguageLib plugin, JavaPlugin apiPlugin, boolean isMain, String prefix, String languagesFolderPath) {
         super(plugin);
         this.apiPlugin = apiPlugin;
-        this.isAPI = !plugin.equals(apiPlugin);
         this.isMain = isMain;
         this.languagesFolderPath = languagesFolderPath;
         this.fullLanguageFolderPath = apiPlugin.getDataFolder().getAbsolutePath() + File.separator + languagesFolderPath;
@@ -249,10 +247,10 @@ public class MessagesManagerImpl extends Manager<String, LanguageImpl> implement
                 continue;
             }
 
-            if (isAPI) {
+            if (!isMain) {
                 Set<String> pluginLanguages = plugin.getManager(PluginMessagesManager.class).getLanguagesNames();
                 if (!pluginLanguages.contains(file.getName())) {
-                    addError(file.getAbsolutePath(), plugin.getName() + " doesn't have such language and it isn't ignored in the config file.");
+                    addError(file.getAbsolutePath(), plugin.getName() + " doesn't have such language (or it's ignored), so it'll be unavailable.");
                     continue;
                 }
             }
@@ -264,7 +262,7 @@ public class MessagesManagerImpl extends Manager<String, LanguageImpl> implement
         if (values.isEmpty()) {
             plugin.logError(Level.SEVERE, errorMessage, new NoLanguagesFoundException("No valid languages were found in " + fullLanguageFolderPath));
 
-        } else if (isAPI) {
+        } else if (!isMain) {
             for (String lang : plugin.getManager(PluginMessagesManager.class).getLanguagesNames()) {
                 if (get(lang, false) == null) {
                     addError(fullLanguageFolderPath, plugin.getName() + " has the language \"" + lang + "\", but \"" + apiPlugin.getName() + "\" doesn't have it." );
@@ -272,7 +270,7 @@ public class MessagesManagerImpl extends Manager<String, LanguageImpl> implement
             }
         }
 
-        if (isAPI) {
+        if (!isMain) {
             String defLangName = plugin.getManager(PluginMessagesManager.class).getDefaultLang().getFileName();
             defLang = get(defLangName, false);
             // If the default language is not found, use the first file found.
