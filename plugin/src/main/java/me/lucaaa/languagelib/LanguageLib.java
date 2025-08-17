@@ -9,6 +9,11 @@ import me.lucaaa.languagelib.data.ServerConsole;
 import me.lucaaa.languagelib.data.configs.MainConfig;
 import me.lucaaa.languagelib.listeners.*;
 import me.lucaaa.languagelib.managers.*;
+import me.lucaaa.languagelib.managers.messages.PluginMessagesManager;
+import me.lucaaa.languagelib.managers.messages.ServerMessagesManager;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
@@ -29,8 +34,9 @@ public final class LanguageLib extends JavaPlugin {
     private final Map<Class<? extends Manager<?, ?>>, Manager<?, ?>> managers = new HashMap<>();
     private DatabaseManager databaseManager;
 
-    // API.
-    APIProviderImplementation apiProvider;
+    // API & Other.
+    private APIProviderImplementation apiProvider;
+    private BukkitAudiences audiences;
 
     // Reload the config files.
     public void reloadConfigs(Messageable reloader) {
@@ -52,9 +58,9 @@ public final class LanguageLib extends JavaPlugin {
 
             // Once all managers have been loaded (including database), send success message if applicable.
             if (reloader != null) {
-                // getManager(MessagesManagerImpl.class) is used instead of reloader.sendMessage() so that the newly created
+                // getManager(PluginMessagesManager.class) is used instead of reloader.sendMessage() so that the newly created
                 // language files are used instead of the ones before reloading (they might have changes).
-                getManager(MessagesManagerImpl.class).sendMessage(reloader, "commands.reload.success", null);
+                getManager(PluginMessagesManager.class).sendMessage(reloader, "commands.reload.success", null);
             }
 
             getServer().getPluginManager().callEvent(new PluginReloadEvent());
@@ -67,17 +73,13 @@ public final class LanguageLib extends JavaPlugin {
         managers.put(ItemsManager.class, new ItemsManager(this, useNewHeads));
 
         if (isRunning) {
-            getManager(MessagesManagerImpl.class).reload();
+            getManager(PluginMessagesManager.class).reload();
+            getManager(ServerMessagesManager.class).reload();
             getManager(PlayersManager.class).reload();
 
         } else {
-            managers.put(MessagesManagerImpl.class, new MessagesManagerImpl(
-                    this,
-                    this,
-                    mainConfig.prefix,
-                    "langs"
-            ));
-
+            managers.put(PluginMessagesManager.class, new PluginMessagesManager(this));
+            managers.put(ServerMessagesManager.class, new ServerMessagesManager(this));
             managers.put(PlayersManager.class, new PlayersManager(this));
         }
 
@@ -109,15 +111,17 @@ public final class LanguageLib extends JavaPlugin {
         // Enables the API.
         apiProvider = new APIProviderImplementation(this);
         APIProvider.setImplementation(apiProvider);
+        audiences = BukkitAudiences.create(this);
 
         isRunning = true;
-        getManager(MessagesManagerImpl.class).sendMessage(getServer().getConsoleSender(), "&aThe plugin has been successfully enabled! &7Version: " + getDescription().getVersion(), true);
+        getManager(PluginMessagesManager.class).sendMessage(getServer().getConsoleSender(), "&aThe plugin has been successfully enabled! &7Version: " + getDescription().getVersion(), true);
     }
 
     @Override
     public void onDisable() {
         getManager(InventoriesManager.class).shutdown();
         if (databaseManager != null) databaseManager.shutdown(true);
+        if (audiences != null) audiences.close();
         isRunning = false;
     }
 
@@ -164,5 +168,13 @@ public final class LanguageLib extends JavaPlugin {
 
     public APIProviderImplementation getApiProvider() {
         return apiProvider;
+    }
+
+    public Audience getAudience(Player player) {
+        return audiences.player(player);
+    }
+
+    public Audience getConsoleAudience() {
+        return audiences.console();
     }
 }

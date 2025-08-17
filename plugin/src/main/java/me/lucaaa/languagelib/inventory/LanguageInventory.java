@@ -4,10 +4,9 @@ import me.lucaaa.languagelib.LanguageLib;
 import me.lucaaa.languagelib.api.language.Messageable;
 import me.lucaaa.languagelib.data.PlayerData;
 import me.lucaaa.languagelib.data.configs.LanguageImpl;
-import me.lucaaa.languagelib.managers.InventoriesManager;
-import me.lucaaa.languagelib.managers.ItemsManager;
-import me.lucaaa.languagelib.managers.MessagesManagerImpl;
-import me.lucaaa.languagelib.managers.PlayersManager;
+import me.lucaaa.languagelib.managers.*;
+import me.lucaaa.languagelib.managers.messages.MessagesManagerImpl;
+import me.lucaaa.languagelib.managers.messages.PluginMessagesManager;
 import me.lucaaa.languagelib.utils.SpecialStacks;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -43,13 +42,13 @@ public class LanguageInventory {
     private final LanguageInventory previous;
 
     public LanguageInventory(LanguageLib plugin, Messageable viewer) {
-        this(plugin, viewer, 0, new ArrayList<>(plugin.getManager(MessagesManagerImpl.class).getLanguages()), null);
+        this(plugin, viewer, 0, new ArrayList<>(plugin.getManager(PluginMessagesManager.class).getLanguages()), null);
     }
 
     public LanguageInventory(LanguageLib plugin, Messageable viewer, int pageIndex, List<LanguageImpl> elements, LanguageInventory previous) {
         this.plugin = plugin;
         this.itemsManager = plugin.getManager(ItemsManager.class);
-        this.messagesManager = plugin.getManager(MessagesManagerImpl.class);
+        this.messagesManager = plugin.getManager(PluginMessagesManager.class);
 
         this.inventory = Bukkit.createInventory(
                 null,

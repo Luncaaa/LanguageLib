@@ -7,8 +7,9 @@ import me.lucaaa.languagelib.commands.subcommands.*;
 import me.lucaaa.languagelib.data.PlayerData;
 import me.lucaaa.languagelib.inventory.LanguageInventory;
 import me.lucaaa.languagelib.managers.InventoriesManager;
-import me.lucaaa.languagelib.managers.MessagesManagerImpl;
+import me.lucaaa.languagelib.managers.messages.MessagesManagerImpl;
 import me.lucaaa.languagelib.managers.PlayersManager;
+import me.lucaaa.languagelib.managers.messages.PluginMessagesManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -29,7 +30,7 @@ public class LanguageCommand implements TabExecutor {
 
     public LanguageCommand(LanguageLib plugin) {
         this.plugin = plugin;
-        this.messagesManager = plugin.getManager(MessagesManagerImpl.class);
+        this.messagesManager = plugin.getManager(PluginMessagesManager.class);
 
         subCommands.put("reload", new ReloadSubCommand(plugin));
         subCommands.put("help", new HelpSubCommand(plugin, subCommands));

@@ -5,7 +5,7 @@ import me.lucaaa.languagelib.api.events.AsyncPlayerLanguageLoadEventImpl;
 import me.lucaaa.languagelib.api.events.LanguageEvent;
 import me.lucaaa.languagelib.api.events.PlayerLanguageChangeEventImpl;
 import me.lucaaa.languagelib.api.language.Language;
-import me.lucaaa.languagelib.managers.MessagesManagerImpl;
+import me.lucaaa.languagelib.managers.messages.PluginMessagesManager;
 import org.bukkit.entity.Player;
 
 public class PlayerData implements LangProvider {
@@ -17,7 +17,7 @@ public class PlayerData implements LangProvider {
         this.plugin = plugin;
         this.player = player;
         // Set language to default until it's loaded.
-        this.lang = plugin.getManager(MessagesManagerImpl.class).getDefaultLang();
+        this.lang = plugin.getManager(PluginMessagesManager.class).getDefaultLang();
 
         plugin.getDatabaseManager().loadPlayerData(this);
     }

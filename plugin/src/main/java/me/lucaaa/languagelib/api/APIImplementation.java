@@ -2,33 +2,20 @@ package me.lucaaa.languagelib.api;
 
 import me.lucaaa.languagelib.LanguageLib;
 import me.lucaaa.languagelib.api.language.MessagesManager;
-import me.lucaaa.languagelib.managers.MessagesManagerImpl;
+import me.lucaaa.languagelib.managers.messages.MessagesManagerImpl;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class APIImplementation implements LanguageAPI {
-    private final LanguageLib languageLib;
-    private final JavaPlugin plugin;
-    private final String prefix;
-    private final String languagesFolderPath;
-
-    private MessagesManager messagesManager;
+    private final MessagesManager messagesManager;
 
     public APIImplementation(LanguageLib languageLib, JavaPlugin plugin, String prefix, String languagesFolderPath) {
-        this.languageLib = languageLib;
-        this.plugin = plugin;
-        this.prefix = prefix;
-        this.languagesFolderPath = languagesFolderPath;
-
-        this.messagesManager = new MessagesManagerImpl(languageLib, plugin, prefix, languagesFolderPath);
+        this.messagesManager = new MessagesManagerImpl(languageLib, plugin, false, prefix, languagesFolderPath);
     }
 
-    /**
-     * Forces the plugin to create a new MessagesManager.
-     */
     @Override
     public void reload() {
-        this.messagesManager = new MessagesManagerImpl(languageLib, plugin, prefix, languagesFolderPath);
+        messagesManager.reload();
     }
 
     @Override

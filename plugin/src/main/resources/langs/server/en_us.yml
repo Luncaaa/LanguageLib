@@ -1,0 +1,6 @@
+# Use this file to create your own keys.
+# To access them use PAPI's placeholder %lang_path.to.key%
+# For example, you'd use %lang_parent.child.key% for this:
+parent:
+  child:
+    key: "Language key"

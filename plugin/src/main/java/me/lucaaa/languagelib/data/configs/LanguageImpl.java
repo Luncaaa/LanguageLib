@@ -15,14 +15,14 @@ public class LanguageImpl extends Config implements Language {
     private final String name;
     private final String code;
 
-    public LanguageImpl(LanguageLib plugin, JavaPlugin apiPlugin, String languagesFolderPath, String fileName) {
+    public LanguageImpl(LanguageLib plugin, JavaPlugin apiPlugin, String languagesFolderPath, String fileName, boolean isMain) {
         super(plugin, apiPlugin, languagesFolderPath + File.separator + fileName, false);
 
         this.name = config.getString("name", "No name set");
         this.code = getNameWithoutExtension(file);
 
         // Cache head in the ItemsManager.
-        if (plugin.equals(apiPlugin)) {
+        if (isMain) {
             String base64 = getOrDefault("flag", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjZlNTIyZDkxODI1MjE0OWU2ZWRlMmVkZjNmZTBmMmMyYzU4ZmVlNmFjMTFjYjg4YzYxNzIwNzIxOGFlNDU5NSJ9fX0=");
             plugin.getManager(ItemsManager.class).cacheHead(fileName, base64);
         }

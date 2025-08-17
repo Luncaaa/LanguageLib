@@ -6,6 +6,7 @@ import me.lucaaa.languagelib.LanguageLib;
 import me.lucaaa.languagelib.data.Database;
 import me.lucaaa.languagelib.data.PlayerData;
 import me.lucaaa.languagelib.data.configs.LanguageImpl;
+import me.lucaaa.languagelib.managers.messages.PluginMessagesManager;
 import org.bukkit.entity.Player;
 
 import java.io.File;
@@ -119,7 +120,7 @@ public class DatabaseManager {
 
         CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
             String playerName = playerData.getPlayer().getName();
-            MessagesManagerImpl messagesManager = plugin.getManager(MessagesManagerImpl.class);
+            PluginMessagesManager messagesManager = plugin.getManager(PluginMessagesManager.class);
 
             try {
                 String language = getOrCreatePlayerLanguage(playerName, playerData.getPlayer());
@@ -158,7 +159,7 @@ public class DatabaseManager {
         }
 
         // If this code is reached (nothing was returned), the player doesn't exist.
-        MessagesManagerImpl messagesManager = plugin.getManager(MessagesManagerImpl.class);
+        PluginMessagesManager messagesManager = plugin.getManager(PluginMessagesManager.class);
         String language = (plugin.getMainConfig().usePlayerLocale) ? player.getLocale() + ".yml" : messagesManager.getDefaultLang().getFileName();
 
         String query1 = "INSERT INTO player_data (name, lang) VALUES (?, ?)";

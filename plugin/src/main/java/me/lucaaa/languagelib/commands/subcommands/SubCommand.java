@@ -1,7 +1,8 @@
 package me.lucaaa.languagelib.commands.subcommands;
 
 import me.lucaaa.languagelib.LanguageLib;
-import me.lucaaa.languagelib.managers.MessagesManagerImpl;
+import me.lucaaa.languagelib.managers.messages.MessagesManagerImpl;
+import me.lucaaa.languagelib.managers.messages.PluginMessagesManager;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ public abstract class SubCommand {
 
     public SubCommand(LanguageLib plugin) {
         this.plugin = plugin;
-        this.messagesManager = plugin.getManager(MessagesManagerImpl.class);
+        this.messagesManager = plugin.getManager(PluginMessagesManager.class);
     }
 
     public abstract String getName();
