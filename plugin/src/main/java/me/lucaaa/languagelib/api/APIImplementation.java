@@ -24,6 +24,6 @@ public class APIImplementation implements LanguageAPI {
     }
 
     public void onLeave(Player player) {
-        ((MessagesManagerImpl) messagesManager).onLeave(player);
+        ((MessagesManagerImpl) messagesManager).removeMessageable(player);
     }
 }

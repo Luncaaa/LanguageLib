@@ -2,7 +2,6 @@ package me.lucaaa.languagelib.managers;
 
 import me.lucaaa.languagelib.LanguageLib;
 import me.lucaaa.languagelib.data.PlayerData;
-import me.lucaaa.languagelib.managers.messages.PluginMessagesManager;
 import org.bukkit.entity.Player;
 
 public class PlayersManager extends Manager<Player, PlayerData> {
@@ -16,7 +15,7 @@ public class PlayersManager extends Manager<Player, PlayerData> {
 
     public void removePlayer(Player player) {
         remove(player, playerData -> {
-            plugin.getManager(PluginMessagesManager.class).onLeave(player);
+            plugin.getPluginMessagesManager().removeMessageable(player);
             plugin.getApiProvider().onLeave(player);
         });
     }

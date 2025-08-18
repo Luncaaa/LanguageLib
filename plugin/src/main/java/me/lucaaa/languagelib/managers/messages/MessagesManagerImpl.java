@@ -9,13 +9,13 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import me.lucaaa.languagelib.data.LangProvider;
 import me.lucaaa.languagelib.data.MessageableImpl;
 import me.lucaaa.languagelib.managers.Manager;
-import me.lucaaa.languagelib.managers.PlayersManager;
 import me.lucaaa.languagelib.utils.NoLanguagesFoundException;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -152,11 +152,15 @@ public class MessagesManagerImpl extends Manager<String, LanguageImpl> implement
 
     @Override
     public Messageable getMessageable(CommandSender sender) {
+        if (!(sender instanceof Player) && !(sender instanceof ConsoleCommandSender)) {
+            throw new IllegalArgumentException("You can only get a Messageable instance for players and console!");
+        }
+
         return messageables.computeIfAbsent(sender, s -> {
             LangProvider langProvider;
             if (sender instanceof Player) {
                 Player player = (Player) sender;
-                langProvider = plugin.getManager(PlayersManager.class).get(player);
+                langProvider = plugin.getPlayersManager().get(player);
             } else {
                 langProvider = plugin.getServerConsole();
             }
@@ -196,7 +200,7 @@ public class MessagesManagerImpl extends Manager<String, LanguageImpl> implement
         }
     }
 
-    public void onLeave(Player player) {
+    public void removeMessageable(Player player) {
         messageables.remove(player);
     }
 
@@ -248,7 +252,7 @@ public class MessagesManagerImpl extends Manager<String, LanguageImpl> implement
             }
 
             if (!isMain) {
-                Set<String> pluginLanguages = plugin.getManager(PluginMessagesManager.class).getLanguagesNames();
+                Set<String> pluginLanguages = plugin.getPluginMessagesManager().getLanguagesNames();
                 if (!pluginLanguages.contains(file.getName())) {
                     addError(file.getAbsolutePath(), plugin.getName() + " doesn't have such language (or it's ignored), so it'll be unavailable.");
                     continue;
@@ -263,7 +267,7 @@ public class MessagesManagerImpl extends Manager<String, LanguageImpl> implement
             plugin.logError(Level.SEVERE, errorMessage, new NoLanguagesFoundException("No valid languages were found in " + fullLanguageFolderPath));
 
         } else if (!isMain) {
-            for (String lang : plugin.getManager(PluginMessagesManager.class).getLanguagesNames()) {
+            for (String lang : plugin.getPluginMessagesManager().getLanguagesNames()) {
                 if (get(lang, false) == null) {
                     addError(fullLanguageFolderPath, plugin.getName() + " has the language \"" + lang + "\", but \"" + apiPlugin.getName() + "\" doesn't have it." );
                 }
@@ -271,7 +275,7 @@ public class MessagesManagerImpl extends Manager<String, LanguageImpl> implement
         }
 
         if (!isMain) {
-            String defLangName = plugin.getManager(PluginMessagesManager.class).getDefaultLang().getFileName();
+            String defLangName = plugin.getPluginMessagesManager().getDefaultLang().getFileName();
             defLang = get(defLangName, false);
             // If the default language is not found, use the first file found.
             if (defLang == null) {

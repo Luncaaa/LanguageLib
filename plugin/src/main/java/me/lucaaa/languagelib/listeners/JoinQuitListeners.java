@@ -1,7 +1,6 @@
 package me.lucaaa.languagelib.listeners;
 
 import me.lucaaa.languagelib.LanguageLib;
-import me.lucaaa.languagelib.managers.PlayersManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -16,11 +15,11 @@ public class JoinQuitListeners implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        plugin.getManager(PlayersManager.class).addPlayer(event.getPlayer());
+        plugin.getPlayersManager().addPlayer(event.getPlayer());
     }
 
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent event) {
-        plugin.getManager(PlayersManager.class).removePlayer(event.getPlayer());
+        plugin.getPlayersManager().removePlayer(event.getPlayer());
     }
 }

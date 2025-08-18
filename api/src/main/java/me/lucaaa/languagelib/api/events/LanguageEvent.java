@@ -38,6 +38,10 @@ public class LanguageEvent extends Event {
         return handlerList;
     }
 
+    /**
+     * Required by Spigot's {@link Event}
+     * @return The HandlerList.
+     */
     @NotNull
     @Override
     public HandlerList getHandlers() {

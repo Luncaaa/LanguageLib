@@ -48,7 +48,7 @@ public class PlaceholdersManager extends PlaceholderExpansion {
         String format = parts[0];
         String key = parts[1];
 
-        ServerMessagesManager messagesManager = plugin.getManager(ServerMessagesManager.class);
+        ServerMessagesManager messagesManager = plugin.getServerMessagesManager();
         if (format.equalsIgnoreCase("legacy")) {
             return messagesManager.getMessageLegacy(player, key, null, false);
 

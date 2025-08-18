@@ -6,7 +6,6 @@ import me.lucaaa.languagelib.data.PlayerData;
 import me.lucaaa.languagelib.data.configs.LanguageImpl;
 import me.lucaaa.languagelib.managers.*;
 import me.lucaaa.languagelib.managers.messages.MessagesManagerImpl;
-import me.lucaaa.languagelib.managers.messages.PluginMessagesManager;
 import me.lucaaa.languagelib.utils.SpecialStacks;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -42,13 +41,13 @@ public class LanguageInventory {
     private final LanguageInventory previous;
 
     public LanguageInventory(LanguageLib plugin, Messageable viewer) {
-        this(plugin, viewer, 0, new ArrayList<>(plugin.getManager(PluginMessagesManager.class).getLanguages()), null);
+        this(plugin, viewer, 0, new ArrayList<>(plugin.getPluginMessagesManager().getLanguages()), null);
     }
 
     public LanguageInventory(LanguageLib plugin, Messageable viewer, int pageIndex, List<LanguageImpl> elements, LanguageInventory previous) {
         this.plugin = plugin;
-        this.itemsManager = plugin.getManager(ItemsManager.class);
-        this.messagesManager = plugin.getManager(PluginMessagesManager.class);
+        this.itemsManager = plugin.getItemsManager();
+        this.messagesManager = plugin.getPluginMessagesManager();
 
         this.inventory = Bukkit.createInventory(
                 null,
@@ -103,7 +102,7 @@ public class LanguageInventory {
             addButton(46, new InventoryButton(itemsManager.getItem(viewer, "previous_page", getPlaceholders())) {
                 @Override
                 public void onClick(InventoryClickEvent event) {
-                    plugin.getManager(InventoriesManager.class).handleOpen((Player) event.getWhoClicked(), previous);
+                    plugin.getInventoriesManager().handleOpen((Player) event.getWhoClicked(), previous);
                 }
             });
         }
@@ -119,7 +118,7 @@ public class LanguageInventory {
             addButton(52, new InventoryButton(itemsManager.getItem(viewer, ".next_page", getPlaceholders())) {
                 @Override
                 public void onClick(InventoryClickEvent event) {
-                    plugin.getManager(InventoriesManager.class).handleOpen((Player) event.getWhoClicked(), copy(pageIndex + 1, LanguageInventory.this));
+                    plugin.getInventoriesManager().handleOpen((Player) event.getWhoClicked(), copy(pageIndex + 1, LanguageInventory.this));
                 }
             });
         }
@@ -127,13 +126,13 @@ public class LanguageInventory {
 
     protected void reopen() {
         Player player = (Player) viewer.getSender();
-        plugin.getManager(InventoriesManager.class).handleOpen(player, copy(pageIndex, previous));
+        plugin.getInventoriesManager().handleOpen(player, copy(pageIndex, previous));
     }
 
     private InventoryButton parseButton(LanguageImpl element) {
         Map<String, String> placeholders = getPlaceholders();
         Player player = (Player) viewer.getSender();
-        PlayerData playerData = plugin.getManager(PlayersManager.class).get(player);
+        PlayerData playerData = plugin.getPlayersManager().get(player);
 
         String selected;
         if (element.equals(playerData.getLang())) {
@@ -146,7 +145,7 @@ public class LanguageInventory {
         placeholders.put("%name%", element.getName());
         placeholders.put("%code%", element.getCode());
 
-        ItemStack itemStack = plugin.getManager(ItemsManager.class).getHead(viewer, element.getFileName(), placeholders, "language");
+        ItemStack itemStack = plugin.getItemsManager().getHead(viewer, element.getFileName(), placeholders, "language");
         // Only selected language will be enchanted.
         if (element.equals(playerData.getLang())) {
             ItemMeta meta = itemStack.getItemMeta();
@@ -201,7 +200,7 @@ public class LanguageInventory {
     }
 
     protected ItemStack getFiller() {
-        return plugin.getManager(ItemsManager.class).getItem(viewer, "border", getPlaceholders());
+        return plugin.getItemsManager().getItem(viewer, "border", getPlaceholders());
     }
 
     public void onClick(InventoryClickEvent event) {

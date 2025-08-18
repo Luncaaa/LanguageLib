@@ -16,8 +16,6 @@ import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Level;
 
@@ -31,8 +29,12 @@ public final class LanguageLib extends JavaPlugin {
     private MainConfig mainConfig;
 
     // Managers.
-    private final Map<Class<? extends Manager<?, ?>>, Manager<?, ?>> managers = new HashMap<>();
     private DatabaseManager databaseManager;
+    private ItemsManager itemsManager;
+    private PluginMessagesManager pluginMessagesManager;
+    private ServerMessagesManager serverMessagesManager;
+    private PlayersManager playersManager;
+    private InventoriesManager inventoriesManager;
 
     // API & Other.
     private APIProviderImplementation apiProvider;
@@ -49,8 +51,8 @@ public final class LanguageLib extends JavaPlugin {
             initManagers();
 
         } else {
-            if (managers.containsKey(InventoriesManager.class)) {
-                getManager(InventoriesManager.class).shutdown();
+            if (inventoriesManager != null) {
+                inventoriesManager.shutdown();
             }
 
             databaseManager.shutdown(false);
@@ -60,7 +62,7 @@ public final class LanguageLib extends JavaPlugin {
             if (reloader != null) {
                 // getManager(PluginMessagesManager.class) is used instead of reloader.sendMessage() so that the newly created
                 // language files are used instead of the ones before reloading (they might have changes).
-                getManager(PluginMessagesManager.class).sendMessage(reloader, "commands.reload.success", null);
+                pluginMessagesManager.sendMessage(reloader, "commands.reload.success", null);
             }
 
             getServer().getPluginManager().callEvent(new PluginReloadEvent());
@@ -70,20 +72,20 @@ public final class LanguageLib extends JavaPlugin {
     private void initManagers() {
         databaseManager = new DatabaseManager(this);
 
-        managers.put(ItemsManager.class, new ItemsManager(this, useNewHeads));
+        itemsManager = new ItemsManager(this, useNewHeads);
 
         if (isRunning) {
-            getManager(PluginMessagesManager.class).reload();
-            getManager(ServerMessagesManager.class).reload();
-            getManager(PlayersManager.class).reload();
+            pluginMessagesManager.reload();
+            serverMessagesManager.reload();
+            playersManager.reload();
 
         } else {
-            managers.put(PluginMessagesManager.class, new PluginMessagesManager(this));
-            managers.put(ServerMessagesManager.class, new ServerMessagesManager(this));
-            managers.put(PlayersManager.class, new PlayersManager(this));
+            pluginMessagesManager = new PluginMessagesManager(this);
+            serverMessagesManager = new ServerMessagesManager(this);
+            playersManager = new PlayersManager(this);
         }
 
-        managers.put(InventoriesManager.class, new InventoriesManager(this));
+        inventoriesManager = new InventoriesManager(this);
 
         // API must be reloaded after previous managers have been reloaded.
         if (isRunning) {
@@ -119,12 +121,12 @@ public final class LanguageLib extends JavaPlugin {
         }
 
         isRunning = true;
-        getManager(PluginMessagesManager.class).sendMessage(getServer().getConsoleSender(), "&aThe plugin has been successfully enabled! &7Version: " + getDescription().getVersion(), true);
+        pluginMessagesManager.sendMessage(getServer().getConsoleSender(), "&aThe plugin has been successfully enabled! &7Version: " + getDescription().getVersion(), true);
     }
 
     @Override
     public void onDisable() {
-        getManager(InventoriesManager.class).shutdown();
+        if (inventoriesManager != null) inventoriesManager.shutdown();
         if (databaseManager != null) databaseManager.shutdown(true);
         if (audiences != null) audiences.close();
         isRunning = false;
@@ -162,13 +164,28 @@ public final class LanguageLib extends JavaPlugin {
         return this.mainConfig;
     }
 
-    @SuppressWarnings("unchecked")
-    public <T extends Manager<?, ?>> T getManager(Class<T> manager) {
-        return (T) managers.get(manager);
-    }
-
     public DatabaseManager getDatabaseManager() {
         return databaseManager;
+    }
+
+    public ItemsManager getItemsManager() {
+        return itemsManager;
+    }
+
+    public PluginMessagesManager getPluginMessagesManager() {
+        return pluginMessagesManager;
+    }
+
+    public ServerMessagesManager getServerMessagesManager() {
+        return serverMessagesManager;
+    }
+
+    public PlayersManager getPlayersManager() {
+        return playersManager;
+    }
+
+    public InventoriesManager getInventoriesManager() {
+        return inventoriesManager;
     }
 
     public APIProviderImplementation getApiProvider() {

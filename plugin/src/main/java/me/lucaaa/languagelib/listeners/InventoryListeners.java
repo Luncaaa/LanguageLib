@@ -1,7 +1,6 @@
 package me.lucaaa.languagelib.listeners;
 
 import me.lucaaa.languagelib.LanguageLib;
-import me.lucaaa.languagelib.managers.InventoriesManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -17,11 +16,11 @@ public class InventoryListeners implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        plugin.getManager(InventoriesManager.class).handleClick(event);
+        plugin.getInventoriesManager().handleClick(event);
     }
 
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
-        plugin.getManager(InventoriesManager.class).handleClose((Player) event.getPlayer());
+        plugin.getInventoriesManager().handleClose((Player) event.getPlayer());
     }
 }

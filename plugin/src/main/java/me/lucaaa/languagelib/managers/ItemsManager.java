@@ -4,7 +4,6 @@ import me.lucaaa.languagelib.LanguageLib;
 import me.lucaaa.languagelib.api.language.Messageable;
 import me.lucaaa.languagelib.api.language.MessagesManager;
 import me.lucaaa.languagelib.data.configs.ItemConfig;
-import me.lucaaa.languagelib.managers.messages.PluginMessagesManager;
 import me.lucaaa.languagelib.utils.SpecialStacks;
 import me.lucaaa.languagelib.v1_18_R1.HeadUtils;
 import org.bukkit.ChatColor;
@@ -86,7 +85,7 @@ public class ItemsManager extends Manager<String, ItemConfig.Item> {
             return itemStack;
         }
 
-        MessagesManager messagesManager = plugin.getManager(PluginMessagesManager.class);
+        MessagesManager messagesManager = plugin.getPluginMessagesManager();
         ItemMeta meta = itemStack.getItemMeta();
         if (meta != null) {
             if (item.name != null) {

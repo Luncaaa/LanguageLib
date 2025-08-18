@@ -2,7 +2,6 @@ package me.lucaaa.languagelib.data;
 
 import me.lucaaa.languagelib.LanguageLib;
 import me.lucaaa.languagelib.data.configs.LanguageImpl;
-import me.lucaaa.languagelib.managers.messages.PluginMessagesManager;
 
 public class ServerConsole implements LangProvider {
     private final LanguageLib plugin;
@@ -13,6 +12,6 @@ public class ServerConsole implements LangProvider {
 
     @Override
     public LanguageImpl getLang() {
-        return plugin.getManager(PluginMessagesManager.class).getDefaultLang();
+        return plugin.getPluginMessagesManager().getDefaultLang();
     }
 }

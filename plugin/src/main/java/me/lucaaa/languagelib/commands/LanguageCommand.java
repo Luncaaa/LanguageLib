@@ -6,10 +6,7 @@ import me.lucaaa.languagelib.api.language.Messageable;
 import me.lucaaa.languagelib.commands.subcommands.*;
 import me.lucaaa.languagelib.data.PlayerData;
 import me.lucaaa.languagelib.inventory.LanguageInventory;
-import me.lucaaa.languagelib.managers.InventoriesManager;
 import me.lucaaa.languagelib.managers.messages.MessagesManagerImpl;
-import me.lucaaa.languagelib.managers.PlayersManager;
-import me.lucaaa.languagelib.managers.messages.PluginMessagesManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -30,7 +27,7 @@ public class LanguageCommand implements TabExecutor {
 
     public LanguageCommand(LanguageLib plugin) {
         this.plugin = plugin;
-        this.messagesManager = plugin.getManager(PluginMessagesManager.class);
+        this.messagesManager = plugin.getPluginMessagesManager();
 
         subCommands.put("reload", new ReloadSubCommand(plugin));
         subCommands.put("help", new HelpSubCommand(plugin, subCommands));
@@ -73,7 +70,7 @@ public class LanguageCommand implements TabExecutor {
         // If there are no arguments, show an error.
         if (args.length == 0) {
             if (sender instanceof Player) {
-                plugin.getManager(InventoriesManager.class).handleOpen((Player) sender, new LanguageInventory(plugin, messageable));
+                plugin.getInventoriesManager().handleOpen((Player) sender, new LanguageInventory(plugin, messageable));
             } else {
                 messageable.sendMessage("commands.main.player_command_only");
             }
@@ -82,7 +79,7 @@ public class LanguageCommand implements TabExecutor {
 
         // If the subcommand does not exist, check if it's a language.
         if (!subCommands.containsKey(args[0])) {
-            PlayerData playerData = plugin.getManager(PlayersManager.class).get((Player) sender);
+            PlayerData playerData = plugin.getPlayersManager().get((Player) sender);
             Language language = messagesManager.get(args[0] + ".yml");
 
             Map<String, String> placeholders = new HashMap<>();

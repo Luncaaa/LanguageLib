@@ -120,7 +120,7 @@ public class DatabaseManager {
 
         CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
             String playerName = playerData.getPlayer().getName();
-            PluginMessagesManager messagesManager = plugin.getManager(PluginMessagesManager.class);
+            PluginMessagesManager messagesManager = plugin.getPluginMessagesManager();
 
             try {
                 String language = getOrCreatePlayerLanguage(playerName, playerData.getPlayer());
@@ -159,8 +159,7 @@ public class DatabaseManager {
         }
 
         // If this code is reached (nothing was returned), the player doesn't exist.
-        PluginMessagesManager messagesManager = plugin.getManager(PluginMessagesManager.class);
-        String language = (plugin.getMainConfig().usePlayerLocale) ? player.getLocale() + ".yml" : messagesManager.getDefaultLang().getFileName();
+        String language = (plugin.getMainConfig().usePlayerLocale) ? player.getLocale() + ".yml" : plugin.getPluginMessagesManager().getDefaultLang().getFileName();
 
         String query1 = "INSERT INTO player_data (name, lang) VALUES (?, ?)";
         try (Connection conn = getConnection();

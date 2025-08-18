@@ -2,7 +2,6 @@ package me.lucaaa.languagelib.data.configs;
 
 import me.lucaaa.languagelib.LanguageLib;
 import me.lucaaa.languagelib.api.language.Language;
-import me.lucaaa.languagelib.managers.ItemsManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -24,7 +23,7 @@ public class LanguageImpl extends Config implements Language {
         // Cache head in the ItemsManager.
         if (isMain) {
             String base64 = getOrDefault("flag", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjZlNTIyZDkxODI1MjE0OWU2ZWRlMmVkZjNmZTBmMmMyYzU4ZmVlNmFjMTFjYjg4YzYxNzIwNzIxOGFlNDU5NSJ9fX0=");
-            plugin.getManager(ItemsManager.class).cacheHead(fileName, base64);
+            plugin.getItemsManager().cacheHead(fileName, base64);
         }
 
         // Each key that is not a config section is added to the map along with its corresponding message
