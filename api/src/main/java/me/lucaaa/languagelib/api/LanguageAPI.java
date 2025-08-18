@@ -25,8 +25,6 @@ public interface LanguageAPI {
      * Reloads the API instance.
      * <p>
      * Use it when your plugin's reload command is used so that changes in language files are reflected.
-     * <p>
-     * All {@link Messageable} objects will be different after reloading!
      */
     default void reload() {
         getMessagesManager().reload();
