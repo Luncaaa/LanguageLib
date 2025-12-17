@@ -5,7 +5,6 @@ import me.lucaaa.languagelib.api.language.Messageable;
 import me.lucaaa.languagelib.api.language.MessagesManager;
 import me.lucaaa.languagelib.data.configs.ItemConfig;
 import me.lucaaa.languagelib.utils.SpecialStacks;
-import me.lucaaa.languagelib.v1_18_R1.HeadUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -15,23 +14,17 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.logging.Level;
 
 public class ItemsManager extends Manager<String, ItemConfig.Item> {
-    private final boolean useNewHeads;
     private final ItemConfig itemConfig;
     private final Map<String, ItemStack> heads = new HashMap<>();
     private final ItemStack NOT_FOUND;
-    private final BiConsumer<String, Throwable> onError;
 
-    public ItemsManager(LanguageLib plugin, boolean useNewHeads) {
+    public ItemsManager(LanguageLib plugin) {
         super(plugin);
-        this.useNewHeads = useNewHeads;
-        this.onError = (message, error) -> plugin.logError(Level.WARNING, message, error);
 
-        this.itemConfig = new ItemConfig(plugin, useNewHeads);
+        this.itemConfig = new ItemConfig(plugin);
 
         // Loads item that is used when item is not found
         ItemStack notFound = new ItemStack(Material.BARRIER);
@@ -53,7 +46,7 @@ public class ItemsManager extends Manager<String, ItemConfig.Item> {
 
     public void cacheHead(String key, String base64) {
         CompletableFuture.runAsync(() ->
-                heads.put(key, HeadUtils.createTexturedHead(base64, !useNewHeads, onError))
+                heads.put(key, plugin.getHeadParser().createBase64Head(base64))
         );
     }
 
@@ -68,8 +61,8 @@ public class ItemsManager extends Manager<String, ItemConfig.Item> {
         // If the item set in the items config file is not a head or the base64 value doesn't match, parse the item directly.
         ItemStack headStack = headSettings.itemStack;
         if (headStack.getType() != Material.PLAYER_HEAD ||
-                (HeadUtils.hasTexture(headStack, !useNewHeads, onError) &&
-                        !HeadUtils.isTextureEqual(cachedHead, headStack, !useNewHeads, onError))) {
+                (plugin.getHeadParser().hasTexture(headStack) &&
+                        !plugin.getHeadParser().isTextureEqual(cachedHead, headStack))) {
             return parseItem(headSettings, messageable, placeholders);
         }
 

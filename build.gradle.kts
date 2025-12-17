@@ -29,10 +29,12 @@ subprojects {
     }
 
     dependencies {
-        compileOnly("org.spigotmc:spigot-api:1.13.2-R0.1-SNAPSHOT")
-        implementation("net.kyori:adventure-api:4.24.0")
-        implementation("net.kyori:adventure-text-minimessage:4.24.0")
-        implementation("net.kyori:adventure-text-serializer-legacy:4.24.0")
+        compileOnly("org.spigotmc:spigot-api:1.13.2-R0.1-SNAPSHOT") {
+            exclude(group = "net.md-5", module = "bungeecord-chat")
+        }
+        implementation("net.kyori:adventure-api:4.25.0")
+        implementation("net.kyori:adventure-text-minimessage:4.25.0")
+        implementation("net.kyori:adventure-text-serializer-legacy:4.25.0")
         implementation("net.kyori:adventure-platform-bukkit:4.4.1")
     }
 }

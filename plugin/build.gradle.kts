@@ -7,11 +7,14 @@ repositories {
 }
 
 dependencies {
-    compileOnly("me.clip:placeholderapi:2.11.6")
-    implementation("com.zaxxer:HikariCP:7.0.1")
+    compileOnly("me.clip:placeholderapi:2.11.7")
+    implementation("com.zaxxer:HikariCP:7.0.2")
 
     implementation(project(":api"))
-    implementation(project(":v1_18_R1"))
+    implementation(project(":versions"))
+    implementation(project(":versions:common"))
+    implementation(project(":versions:v1_13_R2"))
+    implementation(project(":versions:v1_18_R1"))
 }
 
 tasks {

@@ -5,12 +5,16 @@ import me.lucaaa.languagelib.api.APIProviderImplementation;
 import me.lucaaa.languagelib.api.events.PluginReloadEvent;
 import me.lucaaa.languagelib.api.language.Messageable;
 import me.lucaaa.languagelib.commands.LanguageCommand;
+import me.lucaaa.languagelib.common.HeadParser;
+import me.lucaaa.languagelib.common.Logger;
 import me.lucaaa.languagelib.data.ServerConsole;
 import me.lucaaa.languagelib.data.configs.MainConfig;
 import me.lucaaa.languagelib.listeners.*;
 import me.lucaaa.languagelib.managers.*;
 import me.lucaaa.languagelib.managers.messages.PluginMessagesManager;
 import me.lucaaa.languagelib.managers.messages.ServerMessagesManager;
+import me.lucaaa.languagelib.v1_13_R2.LegacyHeadParser;
+import me.lucaaa.languagelib.v1_18_R1.ModernHeadParser;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.entity.Player;
@@ -19,7 +23,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.Objects;
 import java.util.logging.Level;
 
-public final class LanguageLib extends JavaPlugin {
+public final class LanguageLib extends JavaPlugin implements Logger {
     private boolean isRunning = false;
     private boolean useNewHeads;
     private boolean isPapiInstalled;
@@ -27,6 +31,7 @@ public final class LanguageLib extends JavaPlugin {
 
     // Config files.
     private MainConfig mainConfig;
+    private HeadParser headParser;
 
     // Managers.
     private DatabaseManager databaseManager;
@@ -70,9 +75,10 @@ public final class LanguageLib extends JavaPlugin {
     }
 
     private void initManagers() {
+        headParser = useNewHeads ? new ModernHeadParser(this) : new LegacyHeadParser(this);
         databaseManager = new DatabaseManager(this);
 
-        itemsManager = new ItemsManager(this, useNewHeads);
+        itemsManager = new ItemsManager(this);
 
         if (isRunning) {
             pluginMessagesManager.reload();
@@ -144,10 +150,12 @@ public final class LanguageLib extends JavaPlugin {
         }
     }
 
+    @Override
     public void log(Level level, String message) {
         getLogger().log(level, message);
     }
 
+    @Override
     public void logError(Level level, String message, Throwable error) {
         getLogger().log(level, message, error);
     }
@@ -162,6 +170,10 @@ public final class LanguageLib extends JavaPlugin {
 
     public MainConfig getMainConfig() {
         return this.mainConfig;
+    }
+
+    public HeadParser getHeadParser() {
+        return headParser;
     }
 
     public DatabaseManager getDatabaseManager() {

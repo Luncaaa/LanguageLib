@@ -3,7 +3,6 @@ package me.lucaaa.languagelib.data.configs;
 import me.lucaaa.languagelib.LanguageLib;
 import me.lucaaa.languagelib.managers.ItemsManager;
 import me.lucaaa.languagelib.utils.SpecialStacks;
-import me.lucaaa.languagelib.v1_18_R1.HeadUtils;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
@@ -14,12 +13,10 @@ import java.util.Objects;
 import java.util.logging.Level;
 
 public class ItemConfig extends Config {
-    private final boolean useNewHeads;
     private final Map<String, Item> items = new HashMap<>();
 
-    public ItemConfig(LanguageLib plugin, boolean useNewHeads) {
+    public ItemConfig(LanguageLib plugin) {
         super(plugin, "items.yml", true);
-        this.useNewHeads = useNewHeads;
 
         // Each key that is not a config section is added to the map along with its corresponding message
         for (String key : config.getKeys(true)) {
@@ -58,9 +55,9 @@ public class ItemConfig extends Config {
             ConfigurationSection headSection = itemSection.getConfigurationSection("head");
             if (headSection != null) {
                 if (headSection.isString("base64") && !Objects.requireNonNull(headSection.getString("base64", "")).contains("%")) {
-                    itemStack = HeadUtils.createTexturedHead(headSection.getString("base64"), !useNewHeads, (message, error) -> plugin.logError(Level.WARNING, message, error));
+                    itemStack = plugin.getHeadParser().createBase64Head(headSection.getString("base64"));
                 } else if (headSection.isString("player")) {
-                    itemStack = HeadUtils.createPlayerHead(headSection.getString("player"), !useNewHeads, (message, error) -> plugin.logError(Level.WARNING, message, error));
+                    itemStack = plugin.getHeadParser().createPlayerHead(headSection.getString("player"));
                 }
             }
         }
