@@ -52,17 +52,9 @@ public final class LanguageLib extends JavaPlugin implements Logger {
         mainConfig = new MainConfig(this);
 
         // Managers
+        initManagers();
+
         if (!isRunning) {
-            initManagers();
-
-        } else {
-            if (inventoriesManager != null) {
-                inventoriesManager.shutdown();
-            }
-
-            databaseManager.shutdown(false);
-            initManagers();
-
             // Once all managers have been loaded (including database), send success message if applicable.
             if (reloader != null) {
                 // getManager(PluginMessagesManager.class) is used instead of reloader.sendMessage() so that the newly created
@@ -76,6 +68,8 @@ public final class LanguageLib extends JavaPlugin implements Logger {
 
     private void initManagers() {
         headParser = useNewHeads ? new ModernHeadParser(this) : new LegacyHeadParser(this);
+
+        if (databaseManager != null) databaseManager.shutdown();
         databaseManager = new DatabaseManager(this);
 
         itemsManager = new ItemsManager(this);
@@ -84,6 +78,8 @@ public final class LanguageLib extends JavaPlugin implements Logger {
             pluginMessagesManager.reload();
             serverMessagesManager.reload();
             playersManager.reload();
+            // API must be reloaded after previous managers have been reloaded.
+            apiProvider.reload();
 
         } else {
             pluginMessagesManager = new PluginMessagesManager(this);
@@ -91,12 +87,8 @@ public final class LanguageLib extends JavaPlugin implements Logger {
             playersManager = new PlayersManager(this);
         }
 
+        if (inventoriesManager != null) inventoriesManager.shutdown();
         inventoriesManager = new InventoriesManager(this);
-
-        // API must be reloaded after previous managers have been reloaded.
-        if (isRunning) {
-            apiProvider.reload();
-        }
     }
 
     @Override
@@ -133,7 +125,7 @@ public final class LanguageLib extends JavaPlugin implements Logger {
     @Override
     public void onDisable() {
         if (inventoriesManager != null) inventoriesManager.shutdown();
-        if (databaseManager != null) databaseManager.shutdown(true);
+        if (databaseManager != null) databaseManager.shutdown();
         if (audiences != null) audiences.close();
         isRunning = false;
     }

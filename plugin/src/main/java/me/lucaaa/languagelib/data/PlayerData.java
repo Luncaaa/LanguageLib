@@ -7,14 +7,22 @@ import me.lucaaa.languagelib.api.events.PlayerLanguageChangeEvent;
 import me.lucaaa.languagelib.api.language.Language;
 import org.bukkit.entity.Player;
 
+import java.util.UUID;
+
 public class PlayerData implements LangProvider {
     private final LanguageLib plugin;
     private final Player player;
+    private final UUID uuid;
+    private final String name;
+    private final String locale;
     private Language lang;
 
     public PlayerData(LanguageLib plugin, Player player) {
         this.plugin = plugin;
         this.player = player;
+        this.uuid = player.getUniqueId();
+        this.name = player.getName();
+        this.locale = player.getLocale();
         // Set language to default until it's loaded.
         this.lang = plugin.getPluginMessagesManager().getDefaultLang();
 
@@ -52,7 +60,16 @@ public class PlayerData implements LangProvider {
     }
     // -----
 
-    public Player getPlayer() {
-        return player;
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getLocale() {
+        return locale;
     }
 }

@@ -7,7 +7,6 @@ import me.lucaaa.languagelib.data.Database;
 import me.lucaaa.languagelib.data.PlayerData;
 import me.lucaaa.languagelib.data.configs.LanguageImpl;
 import me.lucaaa.languagelib.managers.messages.PluginMessagesManager;
-import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +14,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.*;
 import java.util.logging.Level;
 
@@ -22,21 +23,28 @@ import java.util.logging.Level;
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class DatabaseManager {
     private final LanguageLib plugin;
-    private final ConcurrentLinkedQueue<CompletableFuture<Void>> pendingOperations;
+    private final CompletableFuture<Void> initFuture;
+    private final Set<CompletableFuture<Void>> pendingOperations = ConcurrentHashMap.newKeySet();
+    private final ExecutorService dbExecutor = Executors.newFixedThreadPool(5);
 
     private HikariDataSource dataSource;
     private volatile boolean isShuttingDown = false;
 
     public DatabaseManager(LanguageLib plugin) {
         this.plugin = plugin;
-        this.pendingOperations = new ConcurrentLinkedQueue<>();
 
-        initializeDatabase();
+        CompletableFuture<Void> tracker = new CompletableFuture<>();
+        pendingOperations.add(tracker);
+
+        this.initFuture = CompletableFuture.runAsync(this::initializeDatabase, dbExecutor)
+                .whenComplete((result, e) -> {
+                    if (e != null) plugin.logError(Level.SEVERE, "The database couldn't be loaded! Players won't see their saved languages.", e);
+
+                    tracker.complete(null);
+                    pendingOperations.remove(tracker);
+                });
     }
 
-    /**
-     * Should probably be run async
-     */
     private void initializeDatabase() {
         String url;
         String user;
@@ -48,7 +56,10 @@ public class DatabaseManager {
             password = null;
             File dbFile = new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "playerdata.db");
             try {
-                if (!dbFile.exists()) dbFile.createNewFile();
+                if (!dbFile.exists()) {
+                    dbFile.mkdirs();
+                    dbFile.createNewFile();
+                }
             } catch (IOException e) {
                 plugin.logError(Level.WARNING, "An error occurred while creating the database file.", e);
             }
@@ -66,7 +77,7 @@ public class DatabaseManager {
 
         setupPool(useMySQL, url, user, password);
 
-        String query = "CREATE TABLE IF NOT EXISTS player_data(name TINYTEXT, lang TINYTEXT)";
+        String query = "CREATE TABLE IF NOT EXISTS player_data(uuid VARCHAR(36) PRIMARY KEY, lang VARCHAR(32))";
         try (Connection conn = getConnection(); PreparedStatement statement = conn.prepareStatement(query)) {
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -102,7 +113,6 @@ public class DatabaseManager {
         dataSource = new HikariDataSource(config);
     }
 
-
     private Connection getConnection() throws SQLException {
         if (dataSource == null || dataSource.isClosed()) {
             throw new SQLException("Database connection pool is not available");
@@ -118,12 +128,14 @@ public class DatabaseManager {
             return;
         }
 
-        CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
-            String playerName = playerData.getPlayer().getName();
+        CompletableFuture<Void> tracker = new CompletableFuture<>();
+        pendingOperations.add(tracker);
+
+        initFuture.thenRunAsync(() -> {
             PluginMessagesManager messagesManager = plugin.getPluginMessagesManager();
 
             try {
-                String language = getOrCreatePlayerLanguage(playerName, playerData.getPlayer());
+                String language = getOrCreatePlayerLanguage(playerData.getUuid(), playerData.getLocale());
 
                 LanguageImpl lang = messagesManager.get(language, false);
                 if (lang == null) {
@@ -132,24 +144,26 @@ public class DatabaseManager {
                     playerData.setLang(lang, true);
                 }
             } catch (SQLException e) {
-                plugin.logError(Level.SEVERE, "Failed to load data for player " + playerName, e);
+                plugin.logError(Level.SEVERE, "Failed to load data for player " + playerData.getName(), e);
                 // Set default language on error
                 playerData.setLang(messagesManager.getDefaultLang(), true);
             }
-        });
 
-        pendingOperations.add(future);
-        future.whenComplete((v, t) -> pendingOperations.remove(future));
+        }, dbExecutor).whenComplete((result, e) -> {
+            tracker.complete(null);
+            pendingOperations.remove(tracker);
+        });
     }
 
     /**
      * Gets the player's language or creates a new entry in the database if it doesn't exist
      */
-    private String getOrCreatePlayerLanguage(String playerName, Player player) throws SQLException {
-        String query = "SELECT lang FROM player_data WHERE name = ?";
+    private String getOrCreatePlayerLanguage(UUID uuid, String locale) throws SQLException {
+        String query = "SELECT lang FROM player_data WHERE uuid = ?";
+        String uuidStr = uuid.toString();
         try (Connection conn = getConnection();
              PreparedStatement statement = conn.prepareStatement(query)) {
-            statement.setString(1, playerName);
+            statement.setString(1, uuidStr);
 
             try (ResultSet rs = statement.executeQuery()) {
                 if (rs.next()) {
@@ -159,12 +173,12 @@ public class DatabaseManager {
         }
 
         // If this code is reached (nothing was returned), the player doesn't exist.
-        String language = (plugin.getMainConfig().usePlayerLocale) ? player.getLocale() + ".yml" : plugin.getPluginMessagesManager().getDefaultLang().getFileName();
+        String language = (plugin.getMainConfig().usePlayerLocale) ? locale + ".yml" : plugin.getPluginMessagesManager().getDefaultLang().getFileName();
 
-        String query1 = "INSERT INTO player_data (name, lang) VALUES (?, ?)";
+        String query1 = "INSERT INTO player_data (uuid, lang) VALUES (?, ?)";
         try (Connection conn = getConnection();
              PreparedStatement statement = conn.prepareStatement(query1)) {
-            statement.setString(1, playerName);
+            statement.setString(1, uuidStr);
             statement.setString(2, language);
             statement.executeUpdate();
         }
@@ -182,35 +196,47 @@ public class DatabaseManager {
             return;
         }
 
-        CompletableFuture<Void> future = CompletableFuture.runAsync(() -> savePlayerDataSync(playerData));
+        CompletableFuture<Void> tracker = new CompletableFuture<>();
+        pendingOperations.add(tracker);
 
-        pendingOperations.add(future);
-        future.whenComplete((v, t) -> pendingOperations.remove(future));
+        initFuture.thenRunAsync(() -> savePlayerDataSync(playerData), dbExecutor)
+                .whenComplete((result, e) -> {
+                    tracker.complete(null);
+                    pendingOperations.remove(tracker);
+                });
     }
 
     /**
      * Saves player data synchronously (used during shutdown)
      */
     private void savePlayerDataSync(PlayerData playerData) {
-        String playerName = playerData.getPlayer().getName();
+        String uuidStr = playerData.getUuid().toString();
+        String langFileName = playerData.getLang().getFileName();
+        boolean useMySQL = plugin.getMainConfig().database.useMySQL;
+
+        // UPSERT depending on whether the plugin is using MySQL or SQLite
+        String query;
+        if (plugin.getMainConfig().database.useMySQL) {
+            query = "INSERT INTO player_data (uuid, lang) VALUES (?, ?) ON DUPLICATE KEY UPDATE lang = ?";
+        } else {
+            query = "INSERT INTO player_data (uuid, lang) VALUES (?, ?) ON CONFLICT(uuid) DO UPDATE SET lang = excluded.lang";
+        }
 
         try (Connection conn = getConnection();
-             PreparedStatement statement = conn.prepareStatement("UPDATE player_data SET lang = ? WHERE name = ?")) {
-            statement.setString(1, playerData.getLang().getFileName());
-            statement.setString(2, playerName);
+             PreparedStatement statement = conn.prepareStatement(query)) {
 
-            int rowsAffected = statement.executeUpdate();
-            if (rowsAffected == 0) {
-                // If the player doesn't exist, create a new database entry.
-                String query = "INSERT INTO player_data (name, lang) VALUES (?, ?)";
-                try (PreparedStatement insertStmt = conn.prepareStatement(query)) {
-                    insertStmt.setString(1, playerName);
-                    insertStmt.setString(2, playerData.getLang().getFileName());
-                    insertStmt.executeUpdate();
-                }
+            statement.setString(1, uuidStr);
+            statement.setString(2, langFileName);
+
+            // Pass the language again for the UPDATE part of MySQL
+            if (useMySQL) {
+                statement.setString(3, langFileName);
             }
+
+            statement.executeUpdate();
+
         } catch (SQLException e) {
-            plugin.logError(Level.SEVERE, "Failed to save data for player " + playerName, e);
+            plugin.logError(Level.SEVERE, "Failed to save data for player " + playerData.getName(), e);
         }
     }
 
@@ -228,28 +254,28 @@ public class DatabaseManager {
 
     /**
      * Shut down database manager.
+     * Always runs sync because:
+     *  - If plugin is reloading, shutting down sync will make the new instance of the database manager have the updated data.
+     *  - If server is closing, it must be run async anyway.
      */
-    public void shutdown(boolean sync) {
+    public void shutdown() {
         isShuttingDown = true;
 
-        if (sync) {
-            try {
-                waitForPendingOperations().get(30, TimeUnit.SECONDS);
-            } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                plugin.logError(Level.WARNING, "Timeout waiting for database operations to complete", e);
-            }
-
+        try {
+            waitForPendingOperations().get(30, TimeUnit.SECONDS);
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            plugin.logError(Level.WARNING, "Timeout waiting for database operations to complete", e);
+        } finally {
             if (dataSource != null && !dataSource.isClosed()) {
                 dataSource.close();
             }
 
-        } else {
-            waitForPendingOperations().thenRunAsync(() -> {
-                // Close existing pool
-                if (dataSource != null && !dataSource.isClosed()) {
-                    dataSource.close();
-                }
-            });
+            dbExecutor.shutdown();
+            try {
+                dbExecutor.awaitTermination(5, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                plugin.logError(Level.WARNING, "Database executor interrupted while shutting down", e);
+            }
         }
     }
 }
