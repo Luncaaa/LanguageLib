@@ -1,13 +1,9 @@
 plugins {
-    id("com.gradleup.shadow") version("latest.release")
-}
-
-repositories {
-    maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
+    id("com.gradleup.shadow")
 }
 
 dependencies {
-    compileOnly("me.clip:placeholderapi:2.11.7")
+    compileOnly("me.clip:placeholderapi:2.12.2")
     implementation("com.zaxxer:HikariCP:7.0.2")
 
     implementation(project(":api"))
@@ -18,10 +14,6 @@ dependencies {
 }
 
 tasks {
-    compileJava {
-        options.encoding = "UTF-8"
-    }
-
     shadowJar {
         exclude("org/slf4j/**")
         minimize()
